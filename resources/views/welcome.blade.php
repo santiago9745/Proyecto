@@ -5,5 +5,6 @@
         class="nav-link text-white font-weight-bold px-0">
         <i class="fa fa-user me-sm-1"></i>
         <span class="d-sm-inline d-none">Log out</span>
+        <h1>bienvenido al proyecto</h1>
     </a>
 </form>
