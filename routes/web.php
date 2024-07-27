@@ -23,7 +23,7 @@ use App\Http\Controllers\AdminController;
 
 Route::get('/welcome', function () {
     return view('welcome');
-});
+})->name('welcome');
 
 Route::get('/admin', [AdminController::class, 'index'])
 ->middleware('auth.admin')
