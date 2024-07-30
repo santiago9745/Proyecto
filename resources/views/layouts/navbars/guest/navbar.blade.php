@@ -19,13 +19,8 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navigation">
                         <ul class="navbar-nav mx-auto">
-                            <li class="nav-item">
-                                <a class="nav-link d-flex align-items-center me-2 active" aria-current="page"
-                                    href="{{ route('welcome') }}">
-                                    <i class="fa fa-chart-pie opacity-6 text-dark me-1"></i>
-                                    
-                                </a>
-                            </li>
+                            
+                            @if (!Auth::check())
                             <li class="nav-item">
                                 <a class="nav-link me-2" href="{{ route('register') }}">
                                     <i class="fas fa-user-circle opacity-6 text-dark me-1"></i>
@@ -38,6 +33,20 @@
                                     Logearse
                                 </a>
                             </li>
+                            @else
+                            <li class="nav-item">
+                                <form role="form" method="post" action="{{ route('logout') }}" id="logout-form">
+                                    @csrf
+                                    <a href="{{ route('logout') }}"
+                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                                        class="nav-link me-2">
+                                        <i class="fas fa-key opacity-6 text-dark me-1"></i>
+                                        Cerrar secion
+                                    </a>
+                                </form>
+                            </li>
+                            @endif
+                            
                         </ul>
                     </div>
                 </div>
