@@ -43,7 +43,7 @@
                                                 @error('segundoApellido') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
                                             </div>
                                             <div class="flex flex-col mb-3">
-                                                <input type="email" name="email" class="form-control" placeholder="Email" aria-label="Email" value="{{ old('email') }}" >
+                                                <input type="email" name="email" class="form-control" placeholder="Correo Electronico" aria-label="Email" value="{{ old('email') }}" >
                                                 @error('email') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
                                             </div>
                                             <div class="flex flex-col mb-3">
@@ -53,13 +53,12 @@
                                             <div class="form-check form-check-info text-start">
                                                 <input class="form-check-input" type="checkbox" name="terms" id="flexCheckDefault" >
                                                 <label class="form-check-label" for="flexCheckDefault">
-                                                    I agree the <a href="javascript:;" class="text-dark font-weight-bolder">Terms and
-                                                        Conditions</a>
+                                                    Acepto los <a href="javascript:;" class="text-dark font-weight-bolder">Terminos y Condiciones</a>
                                                 </label>
                                                 @error('terms') <p class='text-danger text-xs'> {{ $message }} </p> @enderror
                                             </div>
                                             <div class="text-center">
-                                                <button type="submit" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign up</button>
+                                                <button type="submit" class="btn bg-gradient-dark w-100 my-4 mb-2">Registrarse</button>
                                             </div>
                                         </form>
                                     </div>
@@ -71,29 +70,6 @@
             </div>
         </section>
     </main>
-    <script>
-        const images = document.querySelectorAll('.image-slider img');
-        let currentIndex = 0;
-
-        function showImage(index) {
-        images.forEach(image => {
-            image.style.opacity = 0;
-        });
-        images[index].style.opacity = 1;
-        }
-
-        function nextImage() {
-        currentIndex = (currentIndex + 1) % images.length;
-        showImage(currentIndex);
-        }
-
-        // Mostrar la primera imagen al cargar la página
-        showImage(currentIndex);
-
-        // Cambiar de imagen cada 3 segundos
-        setInterval(nextImage, 4000);
-
-    </script>
     @include('layouts.footers.guest.footer')
 @endsection
 

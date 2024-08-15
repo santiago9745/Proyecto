@@ -55,4 +55,11 @@ class User extends Authenticatable
     {
         $this->attributes['password'] = bcrypt($value);
     }
+    // app/Models/User.php
+public function hasChangedPassword()
+{
+    // Lógica para verificar si el usuario ha cambiado su contraseña (por ejemplo, comparando la fecha de último cambio de contraseña)
+    return $this->password_changed_at !== null;
+}
+
 }

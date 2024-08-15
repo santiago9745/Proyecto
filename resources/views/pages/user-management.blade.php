@@ -1,61 +1,66 @@
 @extends('layouts.app')
 
 @section('content')
-    @include('layouts.navbars.auth.topnav', ['title' => 'User Management'])
+    @include('layouts.navbars.auth.topnav', ['title' => 'Gestion de usuarios'])
     <div class="row mt-4 mx-4">
         <div class="col-12">
             
             <div class="card mb-4">
                 <div class="card-header pb-0">
-                    <h6>Users</h6>
+                    <h6>Usuarios</h6>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalAgregar">Agregar usuario</button>
-                <div class="modal fade" id="ModalAgregar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="exampleModalLabel">Edicion de usuarios</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="ps-3">
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalAgregar">Agregar usuario</button>
                         </div>
-                        <div class="modal-body">
-                            <form action="{{route("crud.create")}}" method="POST">
-                                @csrf
-                                <div class="mb-3">
-                                    <label for="exampleInputEmail1" class="form-label">nomabre de usuario</label>
-                                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="username">
+                        <div class="modal fade" id="ModalAgregar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Edicion de usuarios</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="exampleInputEmail1" class="form-label">Nombre</label>
-                                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="nombre">
+                                <div class="modal-body">
+                                    <form action="{{route("crud.create")}}" method="POST">
+                                        @csrf
+                                        
+                                        <div class="mb-3">
+                                            <label for="exampleInputEmail1" class="form-label">Nombre</label>
+                                            <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="nombre">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="exampleInputEmail1" class="form-label">primer apellidos</label>
+                                            <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="primerApellido">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="exampleInputEmail1" class="form-label">segundo apellidos</label>
+                                            <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="segundoApellido">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="exampleInputEmail1" class="form-label">Correo Electronico</label>
+                                            <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email">
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="mb-3">
+                                                <label for="disabledSelect" class="form-label">Rol</label>
+                                                <select id="disabledSelect" class="form-select" name="rol">
+                                                  <option value="Admin">Admin</option>
+                                                  <option value="cancha">cancha</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                            <button type="submitt" class="btn btn-primary">Agregar</button>
+                                        </div>
+                                    </form>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="exampleInputEmail1" class="form-label">primer apellidos</label>
-                                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="primerApellido">
+                                
                                 </div>
-                                <div class="mb-3">
-                                    <label for="exampleInputEmail1" class="form-label">segundo apellidos</label>
-                                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="segundoApellido">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="exampleInputEmail1" class="form-label">Correo Electronico</label>
-                                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="exampleInputEmail1" class="form-label">Contraseña</label>
-                                    <input type="password" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="password">
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                    <button type="submitt" class="btn btn-primary">Agregar</button>
-                                </div>
-                            </form>
+                            </div>
                         </div>
-                        
-                        </div>
-                    </div>
-                </div>
                         <table class="table align-items-center mb-0">
                             <thead>
                                 <tr>
@@ -113,7 +118,7 @@
                                                                     <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="username" value="{{$row->username}}">
                                                                 </div>
                                                                 <div class="mb-3">
-                                                                    <label for="exampleInputEmail1" class="form-label">Nombre</label>
+                                                                    <label for="exampleInputEmail1" class="form-label">Nombre de usuario</label>
                                                                     <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="nombre" value="{{$row->nombre}}">
                                                                 </div>
                                                                 <div class="mb-3">
@@ -128,10 +133,7 @@
                                                                     <label for="exampleInputEmail1" class="form-label">Correo Electronico</label>
                                                                     <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email" value="{{$row->email}}">
                                                                 </div>
-                                                                <div class="mb-3">
-                                                                    <label for="exampleInputEmail1" class="form-label">Contraseña</label>
-                                                                    <input type="password" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="password">
-                                                                </div>
+                                                                
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                                                                     <button type="submit" class="btn btn-primary">modificar</button>

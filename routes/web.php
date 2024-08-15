@@ -18,18 +18,26 @@ use App\Http\Controllers\ResetPassword;
 use App\Http\Controllers\ChangePassword;   
 use App\Http\Controllers\ControllerCrud;        
 use App\Http\Controllers\AdminController;   
+use App\Http\Controllers\CanchasController;
             
 
 
-Route::get('/welcome', function () {
+Route::get('/', function () {
     return view('welcome');
-})->name('welcome');
+})->name('welcome')->middleware('auth.admin');
 
-Route::get('/admin', [AdminController::class, 'index'])
-->middleware('auth.admin')
-->name('admin.index');
-Route::get('/user-management', [ControllerCrud::class, 'index'])->name('crud.index');
-Route::get('/eliminarUsuario-{id}', [ControllerCrud::class, 'delete'])->name('crud.delete');
+
+Route::group(['middleware' => 'auth.admin'], function () {
+    Route::get('/dashboard', [HomeController::class, 'index'])->name('welcome')->middleware('auth');
+	Route::get('/user-management', [ControllerCrud::class, 'index'])->name('crud.index');
+	Route::get('/locales', [CanchasController::class, 'index'])->name('crud.index');
+	Route::get('/eliminarUsuario-{id}', [ControllerCrud::class, 'delete'])->name('crud.delete');
+	Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+});
+
+
+Route::post('/agregarCancha', [CanchasController::class, 'create'])->name('cancha.create');
+
 Route::post('/modificarUsuario', [ControllerCrud::class, 'update'])->name('crud.update');
 Route::post('/agregarUsuario', [ControllerCrud::class, 'create'])->name('crud.create');
 	Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
@@ -40,7 +48,7 @@ Route::post('/agregarUsuario', [ControllerCrud::class, 'create'])->name('crud.cr
 	Route::post('/reset-password', [ResetPassword::class, 'send'])->middleware('guest')->name('reset.perform');
 	Route::get('/change-password', [ChangePassword::class, 'show'])->middleware('guest')->name('change-password');
 	Route::post('/change-password', [ChangePassword::class, 'update'])->middleware('guest')->name('change.perform');
-	Route::get('/dashboard', [HomeController::class, 'index'])->name('home')->middleware('auth');
+	
 Route::group(['middleware' => 'auth'], function () {
 	Route::get('/virtual-reality', [PageController::class, 'vr'])->name('virtual-reality');
 	Route::get('/rtl', [PageController::class, 'rtl'])->name('rtl');

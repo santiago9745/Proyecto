@@ -22,18 +22,28 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'login' => ['required', 'string'],
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        $field = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        if (Auth::attempt([$field => $credentials['login'], 'password' => $credentials['password']])) {
             $request->session()->regenerate();
 
             if(auth()->user()->rol == 'admin'){
                 return redirect()->intended('user-management');
             }
             else{
-                return redirect()->to('/welcome');
+                if (auth()->user()->rol== 'cancha') {
+                    if (auth()->user()->estado == 2) {
+                        return redirect('change-password');
+                    }
+                    else{
+                        return redirect()->to('/');
+                    }
+                }
+                return redirect()->to('/');
             }
         }
 

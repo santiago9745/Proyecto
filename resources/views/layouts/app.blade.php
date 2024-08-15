@@ -33,13 +33,15 @@
             @yield('content')
         @else
             @if (!in_array(request()->route()->getName(), ['profile', 'profile-static']))
-                <div class="min-height-300 bg-primary position-absolute w-100"></div>
+                @if (auth()->user()->rol == 'admin' || auth()->user()->rol == 'cancha')
+                    <div class="min-height-300 bg-primary position-absolute w-100"></div>
+                @endif
             @elseif (in_array(request()->route()->getName(), ['profile-static', 'profile']))
-                <div class="position-absolute w-100 min-height-300 top-0" style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/profile-layout-header.jpg'); background-position-y: 50%;">
+                <div class="position-absolute w-100 min-height-300 top-0" style=" background-position-y: 50%;">
                     <span class="mask bg-primary opacity-6"></span>
                 </div>
             @endif
-            @if (auth()->user()->rol == 'admin')
+            @if (auth()->user()->rol == 'admin' || auth()->user()->rol == 'cancha')
                 @include('layouts.navbars.auth.sidenav')
             @endif
            
@@ -68,6 +70,7 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     <script src="assets/js/argon-dashboard.js"></script>
+    <script src="assets/js/main.js"></script>
     @stack('js')
 </body>
 

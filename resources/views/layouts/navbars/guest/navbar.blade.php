@@ -41,7 +41,7 @@
                                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                                         class="nav-link me-2">
                                         <i class="fas fa-key opacity-6 text-dark me-1"></i>
-                                        Cerrar secion
+                                        Cerrar sesion
                                     </a>
                                 </form>
                             </li>

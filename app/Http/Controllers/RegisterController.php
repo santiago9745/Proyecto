@@ -30,7 +30,7 @@ class RegisterController extends Controller
             return redirect('/dashboard');
         }
         else{
-            return redirect()->to('/welcome');
+            return redirect()->to('/');
         }
         
     }

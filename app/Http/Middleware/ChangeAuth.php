@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminAuth
+class ChangeAuth
 {
     /**
      * Handle an incoming request.
@@ -15,14 +15,13 @@ class AdminAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check()) {
-            if (auth()->user()->rol == 'admin') {
-                return $next($request);
-            }
-            if (auth()->user()->estado == 2) {
-                return redirect('change-password');
-            } 
+        $user = auth()->user();
+
+        // Verificar el estado y la URL
+        if ($user && $user->estado == 2 ) {
+            return redirect()->route('change.password');
         }
+
         return $next($request);
     }
 }

@@ -29,7 +29,7 @@
                                             @csrf
                                             @method('post')
                                             <div class="flex flex-col mb-3">
-                                                <input type="email" name="email" class="form-control form-control-lg" aria-label="Email">
+                                                <input type="text" name="login" class="form-control form-control-lg" aria-label="Email">
                                                 @error('email') <p class="text-danger text-xs pt-1"> {{$message}} </p>@enderror
                                             </div>
                                             <div class="flex flex-col mb-3">
@@ -65,27 +65,4 @@
             </div>
         </section>
     </main>
-    <script>
-        const images = document.querySelectorAll('.image-slider img');
-        let currentIndex = 0;
-
-        function showImage(index) {
-        images.forEach(image => {
-            image.style.opacity = 0;
-        });
-        images[index].style.opacity = 1;
-        }
-
-        function nextImage() {
-        currentIndex = (currentIndex + 1) % images.length;
-        showImage(currentIndex);
-        }
-
-        // Mostrar la primera imagen al cargar la página
-        showImage(currentIndex);
-
-        // Cambiar de imagen cada 3 segundos
-        setInterval(nextImage, 5000);
-
-    </script>
 @endsection

@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\facades\DB;
+use App\Mail\SendMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class ControllerCrud extends Controller
 {
+    
     public function index(){
-        $sql=DB::select("SELECT * FROM users WHERE estado=1");
+        $sql=DB::select("SELECT * FROM users WHERE estado=1 OR estado=2");
         return view(".pages.user-management")->with("sql",$sql);
     }
     public function delete($id){
@@ -28,14 +32,25 @@ class ControllerCrud extends Controller
     }
     public function create(Request $request){
         try {
-            $sql=DB::insert("INSERT INTO users(username,nombre,primerApellido,segundoApellido,email,password) VALUES(?,?,?,?,?,?)",[
-                $request->username,
+            $UserId = auth()->user()->id;
+            $username = strtolower($request->nombre) . '.' . substr($request->primerApellido, 0, 1) . substr($request->segundoApellido, 0, 1);
+            $password = Str::random(10);
+            $sql=DB::insert("INSERT INTO users(username,nombre,primerApellido,segundoApellido,email,rol,idUsuario,password,estado) VALUES(?,?,?,?,?,?,?,?,2)",[
+                $username,
                 strtoupper($request->nombre),
                 strtoupper($request->primerApellido),
                 strtoupper($request->segundoApellido),
                 $request->email,
-                bcrypt($request->password)
+                $request->rol,
+                $UserId,
+                bcrypt($password)
+                
             ]);
+            $data = array(
+                'username' => $username,
+                'password' => $password,
+            );
+            Mail::to($request->email)->send(new SendMail($data));
         } catch (\Throwable $th) {
             $sql=0;
         }
@@ -53,7 +68,7 @@ class ControllerCrud extends Controller
             $id = $request->id;
     
             // Construimos la consulta SQL base
-            $sql = "UPDATE users SET username = ?, nombre = ?, primerApellido = ?, segundoApellido = ?, email = ?";
+            $sql = "UPDATE users SET username = ?, nombre = ?, primerApellido = ?, segundoApellido = ?, email = ?,fechaModificacion=CURRENT_TIMESTAMP()";
             $params = [
                 $request->username,
                 strtoupper($request->nombre),
