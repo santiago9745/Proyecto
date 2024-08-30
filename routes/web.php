@@ -19,6 +19,8 @@ use App\Http\Controllers\ChangePassword;
 use App\Http\Controllers\ControllerCrud;        
 use App\Http\Controllers\AdminController;   
 use App\Http\Controllers\CanchasController;
+use App\Http\Controllers\GestionCancha;
+use App\Http\Controllers\ContenidoController;
             
 
 
@@ -31,13 +33,19 @@ Route::group(['middleware' => 'auth.admin'], function () {
     Route::get('/dashboard', [HomeController::class, 'index'])->name('welcome')->middleware('auth');
 	Route::get('/user-management', [ControllerCrud::class, 'index'])->name('crud.index');
 	Route::get('/locales', [CanchasController::class, 'index'])->name('crud.index');
+	Route::get('/canchas', [GestionCancha::class, 'index'])->name('crud.index');
 	Route::get('/eliminarUsuario-{id}', [ControllerCrud::class, 'delete'])->name('crud.delete');
 	Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+	Route::get('/contenido', [ContenidoController::class, 'index'])->name('admin.index');
 });
-
-
-Route::post('/agregarCancha', [CanchasController::class, 'create'])->name('cancha.create');
-
+Route::post('/asignarUsuarios', [CanchasController::class, 'asignacion'])->name('cancha.asignacion');
+Route::post('/contenido', [ContenidoController::class, 'subir'])->name('cancha.contenido');
+Route::post('/agregarLocal', [CanchasController::class, 'create'])->name('cancha.create');
+Route::post('/agregarCancha', [GestionCancha::class, 'agregar'])->name('cancha.create');
+Route::post('/updateLocal', [CanchasController::class, 'update'])->name('local.update');
+Route::post('/updateCancha', [GestionCancha::class, 'update'])->name('cancha.update');
+Route::get('/eliminarLocal-{id}', [CanchasController::class, 'delete'])->name('local.delete');
+Route::get('/eliminarCancha-{id}', [GestionCancha::class, 'delete'])->name('cancha.delete');
 Route::post('/modificarUsuario', [ControllerCrud::class, 'update'])->name('crud.update');
 Route::post('/agregarUsuario', [ControllerCrud::class, 'create'])->name('crud.create');
 	Route::get('/register', [RegisterController::class, 'create'])->middleware('guest')->name('register');
