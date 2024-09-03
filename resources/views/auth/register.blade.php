@@ -31,6 +31,10 @@
                                                 @error('username') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
                                             </div>
                                             <div class="flex flex-col mb-3">
+                                                <input type="hidden" name="rol" class="form-control" placeholder="Rol" aria-label="Name" value="usuario">
+                                                @error('rol') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
+                                            </div>
+                                            <div class="flex flex-col mb-3">
                                                 <input type="text" name="nombre" class="form-control" placeholder="Nombre" aria-label="Name" value="{{ old('nombre') }}" >
                                                 @error('nombre') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
                                             </div>

@@ -21,6 +21,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CanchasController;
 use App\Http\Controllers\GestionCancha;
 use App\Http\Controllers\ContenidoController;
+use App\Http\Controllers\ReservaController;
             
 
 
@@ -38,9 +39,12 @@ Route::group(['middleware' => 'auth.admin'], function () {
 	Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
 	Route::get('/contenido', [ContenidoController::class, 'index'])->name('admin.index');
 });
-Route::post('/asignarUsuarios', [CanchasController::class, 'asignacion'])->name('cancha.asignacion');
+Route::get('/', [ReservaController::class, 'index'])->name('home.index');
+Route::post('/busqueda', [CanchasController::class, 'buscar'])->name('buscar');
+Route::post('/asignarUsuarios', [CanchasController::class, 'asignacion'])->name('local.asignacion');
+Route::post('/reservar', [ReservaController::class, 'reserva'])->name('reserva');
 Route::post('/contenido', [ContenidoController::class, 'subir'])->name('cancha.contenido');
-Route::post('/agregarLocal', [CanchasController::class, 'create'])->name('cancha.create');
+Route::post('/agregarLocal', [CanchasController::class, 'create'])->name('local.create');
 Route::post('/agregarCancha', [GestionCancha::class, 'agregar'])->name('cancha.create');
 Route::post('/updateLocal', [CanchasController::class, 'update'])->name('local.update');
 Route::post('/updateCancha', [GestionCancha::class, 'update'])->name('cancha.update');

@@ -1,17 +1,17 @@
-.card-border {
-    border: 3px solid lime; /* Borde sólido de 3px de ancho y color azul */
-    border-radius: 15px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2) inset; /* Sombra interior */
-    outline: 2px solid #f0f0f0; /* Contorno exterior */
-}
+  .card-border {
+      border: 3px solid lime; /* Borde sólido de 3px de ancho y color azul */
+      border-radius: 15px;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2) inset; /* Sombra interior */
+      outline: 2px solid #f0f0f0; /* Contorno exterior */
+  }
 
-.card-border:hover {
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Aumenta la sombra al pasar el mouse */
-}
-.form-conteiner{
-    background-color: white;
-    border-radius: 15px;
-}  
+  .card-border:hover {
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Aumenta la sombra al pasar el mouse */
+  }
+  .form-conteiner{
+      background-color: white;
+      border-radius: 15px;
+  }  
   .image-slider {
     position: absolute;
     top: 0;
@@ -33,6 +33,29 @@
   }
   .image-slider img:first-child {
     opacity: 1;
+  }
+  .square {
+    margin-top: 70px;
+    padding-top: 20px;
+    width: 500px;
+    height: 600px;
+    background-color: #f0f0f0;
+    line-height: 200px;
+    border: 2px solid #ccc; /* Añade un borde */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+}
+.tituloLocales{
+  text-align: center;
+}
+.parrafoLocales{
+  padding: 0px 0px 0px 20px;
 }
 
-  
+.rectangle-container {
+  width: 300px; /* Ajusta el ancho según tus necesidades */
+  height: 100px; /* Ajusta el alto según tus necesidades */
+  background-color: #f0f0f0; /* Ajusta el color de fondo */
+  padding: 1rem;
+  border-radius: 10px; /* Si deseas bordes redondeados */
+}

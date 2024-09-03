@@ -15,7 +15,8 @@ class CanchasController extends Controller
     
     public function create(Request $request){
         try {
-            $sql=DB::insert("INSERT INTO locales(nombre,direccion) VALUES(?,?)",[
+            $idUsuario = auth()->user()->id;
+            $sql=DB::insert("INSERT INTO locales(nombre,direccion,idUsuario) VALUES(?,?,$idUsuario)",[
                 strtoupper($request->nombre),
                 strtoupper($request->direccion)
             ]);
@@ -32,7 +33,8 @@ class CanchasController extends Controller
     }
     public function update(Request $request){
         try {
-            $sql=DB::insert("UPDATE locales SET nombre=?, direccion=? WHERE ID_Local=?",[
+            $idUsuario = auth()->user()->id;
+            $sql=DB::insert("UPDATE locales SET nombre=?, direccion=?, fechaModificacion=CURRENT_TIMESTAMP, idUsuario=$idUsuario WHERE ID_Local=?",[
                 strtoupper($request->nombre),
                 strtoupper($request->direccion),
                 $request->id
@@ -80,5 +82,16 @@ class CanchasController extends Controller
         {
             return back()->with("incorrecto","Error al eliminar un usuario");
         }
+    }
+    public function buscar(Request $request){
+        $nombre = strtoupper($request->nombre);
+        $sql=DB::select("SELECT L.ID_Local,L.nombre,L.direccion,T.nombre_deporte
+                        FROM locales L
+                        INNER JOIN canchas C ON L.ID_Local = C.ID_Local
+                        INNER JOIN canchatipo CT ON C.ID_Cancha=CT.ID_Cancha
+                        INNER JOIN tipo T ON T.ID_Tipo = CT.ID_Tipo
+                        WHERE L.estado=1 AND T.nombre_deporte LIKE '%$nombre%' OR L.nombre LIKE '%$nombre%'",[
+                        ]);
+        return view(".pages.busqueda")->with('sql', $sql);
     }
 }

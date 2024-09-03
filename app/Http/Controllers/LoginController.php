@@ -40,10 +40,12 @@ class LoginController extends Controller
                         return redirect('change-password');
                     }
                     else{
-                        return redirect()->to('/');
+                        return redirect()->intended('canchas');
                     }
                 }
-                return redirect()->to('/');
+                else{
+                    return redirect()->intended('/');
+                }
             }
         }
 

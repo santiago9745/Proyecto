@@ -20,10 +20,14 @@ return new class extends Migration
             $table->string('primerApellido')->nullable();
             $table->string('segundoApellido')->nullable();
             $table->string('email')->unique();
-            $table->string('rol')->nullable();
+            $table->string('rol')->nullable()->default('usuario');
             $table->string('password');
+            $table->integer('estado')->default(1);
             $table->rememberToken();
-            $table->timestamps();
+            $table->timestamp('fechaCreacion')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('fechaModificacion')->nullable()->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+            $table->unsignedBigInteger('local')->nullable();
+            $table->foreign('local')->references('ID_Local')->on('locales');
         });
     }
 
