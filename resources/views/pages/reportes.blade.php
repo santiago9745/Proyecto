@@ -1,26 +1,46 @@
+@extends('layouts.app')
 
-    <div class="row mt-4 mx-4">
-        <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header pb-0">
-                    <h6>Reportes</h6>
+@section('content')
+    @include('layouts.navbars.auth.topnav', ['title' => 'Reportes'])
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-success text-white text-center py-4">
+                        <h4 class="mb-0">Generar Reportes de canchas con mas demanda</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <p class="lead">Haz clic en el botón para generar el reporte de canchas con mayor demanda.</p>
+                        <a href="{{ route('reportesCanchas') }}" class="btn btn-lg btn-outline-success mt-3">
+                            <i class="fas fa-chart-bar me-2"></i> Generar Reporte
+                        </a>
+                    </div>
                 </div>
-                <div class="card-body px-0 pt-0 pb-2">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>nombre</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($cancha as $row)
-                                <tr>
-                                    <td>{{$row->nombre}}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-success text-white text-center py-4">
+                        <h4 class="mb-0">Generar Reportes de Utilización de Canchas</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <p class="lead">Haz clic en el botón para generar el reporte de Utilización de Canchas</p>
+                        <form method="GET" action="{{ route('reporteUtilidadCanchas') }}">
+                            <div class="form-group">
+                                <label for="fecha_inicio">Fecha Inicio</label>
+                                <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="fecha_fin">Fecha Fin</label>
+                                <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Generar Reporte</button>
+                        </form>
+                        
+                    </div>
                 </div>
-            </div>        
+            </div>
         </div>
     </div>
+@endsection
+

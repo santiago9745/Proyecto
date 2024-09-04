@@ -22,6 +22,7 @@ use App\Http\Controllers\CanchasController;
 use App\Http\Controllers\GestionCancha;
 use App\Http\Controllers\ContenidoController;
 use App\Http\Controllers\ReservaController;
+use App\Http\Controllers\ReporteController;
             
 
 
@@ -40,7 +41,8 @@ Route::group(['middleware' => 'auth.admin'], function () {
 	Route::get('/contenido', [ContenidoController::class, 'index'])->name('admin.index');
 });
 Route::get('/', [ReservaController::class, 'index'])->name('home.index');
-Route::get('/reportes', [GestionCancha::class, 'pdf'])->name('reportes');
+Route::get('/reporteCanchas', [GestionCancha::class, 'pdf'])->name('reportesCanchas');
+Route::get('/reporteUtilidadCanchas', [GestionCancha::class, 'canchasUtilidad'])->name('reporteUtilidadCanchas');
 Route::post('/busqueda', [CanchasController::class, 'buscar'])->name('buscar');
 Route::post('/asignarUsuarios', [CanchasController::class, 'asignacion'])->name('local.asignacion');
 Route::post('/reservar', [ReservaController::class, 'reserva'])->name('reserva');
