@@ -40,6 +40,7 @@ Route::group(['middleware' => 'auth.admin'], function () {
 	Route::get('/contenido', [ContenidoController::class, 'index'])->name('admin.index');
 });
 Route::get('/', [ReservaController::class, 'index'])->name('home.index');
+Route::get('/reportes', [GestionCancha::class, 'pdf'])->name('reportes');
 Route::post('/busqueda', [CanchasController::class, 'buscar'])->name('buscar');
 Route::post('/asignarUsuarios', [CanchasController::class, 'asignacion'])->name('local.asignacion');
 Route::post('/reservar', [ReservaController::class, 'reserva'])->name('reserva');

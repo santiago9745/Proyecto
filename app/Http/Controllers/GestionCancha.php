@@ -4,17 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class GestionCancha extends Controller
 {
     public function index(){
         $local = auth()->user()->local;
-        $sql=DB::select("SELECT C.ID_Cancha,C.nombre, C.estado_cancha,T.nombre_deporte
+        if ($local != "") {
+            $sql=DB::select("SELECT C.ID_Cancha,C.nombre, C.estado_cancha,T.nombre_deporte
                         FROM canchas C
                         INNER JOIN locales L ON L.ID_Local=C.ID_Local
                         INNER JOIN canchatipo Ct ON C.ID_Cancha=Ct.ID_Cancha
                         INNER JOIN tipo T ON T.ID_Tipo=Ct.ID_Tipo
                         WHERE C.estado=1 AND C.ID_Local=$local");
+        } else {
+            $sql=0;
+        }
         return view(".pages.canchas")->with('sql', $sql);
     }
     public function agregar(Request $request){
@@ -89,5 +94,15 @@ class GestionCancha extends Controller
         {
             return back()->with("incorrecto","Error al eliminar un usuario");
         }
+    }
+    public function pdf(){
+        $cancha=DB::select("SELECT C.ID_Cancha,C.nombre, C.estado_cancha,T.nombre_deporte
+        FROM canchas C
+        INNER JOIN locales L ON L.ID_Local=C.ID_Local
+        INNER JOIN canchatipo Ct ON C.ID_Cancha=Ct.ID_Cancha
+        INNER JOIN tipo T ON T.ID_Tipo=Ct.ID_Tipo
+        WHERE C.estado=1");
+        $pdf = Pdf::loadView('.pages.reportes', compact('cancha'));
+        return $pdf->stream();
     }
 }

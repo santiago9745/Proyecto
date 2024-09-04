@@ -44,15 +44,10 @@
                                 </form>
                             </li>
                             <li class="nav-item">
-                                <form role="form" method="post" action="{{ route('logout') }}" id="logout-form">
-                                    @csrf
-                                    <a href="{{ route('logout') }}"
-                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                                        class="nav-link me-2">
-                                        <i class="fas fa-key opacity-6 text-dark me-1"></i>
-                                        Reservas activas
-                                    </a>
-                                </form>
+                                <a class="nav-link me-2" href="{{ route('login') }}">
+                                    <i class="fas fa-key opacity-6 text-dark me-1"></i>
+                                    Reservas activas
+                                </a>
                             </li>
                             <li class="nav-item ms-auto me-3">
                                 <form action="{{ route('buscar') }}" method="POST" class="d-flex align-items-right">
