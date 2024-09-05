@@ -1,7 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
-<link id="pagestyle" href="/resources/css/app.css" rel="stylesheet">
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show custom-alert" role="alert">
+        <p style="color: white">{{ session('error') }}</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show custom-alert" role="alert">
+        <p style="color: white">{{ session('success') }}</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>               
+@endif
     <div class="container position-sticky z-index-sticky top-0">
         <div class="row">
             <div class="col-12">
@@ -43,7 +54,6 @@
                                     <div id="reserva-container">
                                         <!-- Campo inicial de reserva -->
                                         <div class="reserva-group mb-3">
-                                            <input type="hidden" name="idlocal" value="{{$row->ID_Local}}">
                                             <label class="form-label">Canchas disponibles</label>
                                             <select class="form-select" name="reservas[0][canchas]" required>
                                                 <option value="...">...</option>  
@@ -108,7 +118,6 @@
             const newGroup = document.createElement('div');
             newGroup.className = 'reserva-group mb-3';
             newGroup.innerHTML = `
-                <input type="hidden" name="idlocal" value="{{$row->ID_Local}}">
                 <label class="form-label">Canchas disponibles</label>
                 <select class="form-select" name="reservas[${counter}][canchas]" required>
                     <option value="...">...</option>  

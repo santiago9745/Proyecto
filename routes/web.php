@@ -43,6 +43,7 @@ Route::group(['middleware' => 'auth.admin'], function () {
 Route::get('/', [ReservaController::class, 'index'])->name('home.index');
 Route::get('/reporteCanchas', [GestionCancha::class, 'pdf'])->name('reportesCanchas');
 Route::get('/reporteUtilidadCanchas', [GestionCancha::class, 'canchasUtilidad'])->name('reporteUtilidadCanchas');
+Route::get('/canchasLocales', [ReservaController::class, 'mostrarcanchas'])->name('mostrarcanchas');
 Route::post('/busqueda', [CanchasController::class, 'buscar'])->name('buscar');
 Route::post('/asignarUsuarios', [CanchasController::class, 'asignacion'])->name('local.asignacion');
 Route::post('/reservar', [ReservaController::class, 'reserva'])->name('reserva');
