@@ -9,16 +9,23 @@ use Illuminate\Support\Facades\Auth;
 class ReservaController extends Controller
 {
     public function index(){    
-        $sql=DB::select("SELECT L.ID_Local,L.nombre,L.direccion
-                        FROM locales L
-                        WHERE L.estado=1");
-        $canchas=DB::select("SELECT *
-                        FROM canchas
-                        WHERE estado=1 AND estado_cancha LIKE 'DISPONIBLE'");
-        return view("welcome")->with(['sql' => $sql, 'canchas'=>$canchas]);
+        $locales = DB::select("SELECT L.ID_Local, L.nombre, L.direccion
+                           FROM locales L
+                           WHERE L.estado=1");
+
+    
+        foreach ($locales as $local) {
+        // Obtener las canchas asociadas a este local
+        $local->canchas = DB::select("SELECT *
+                                      FROM canchas
+                                      WHERE ID_Local = ? AND estado=1 AND estado_cancha LIKE 'DISPONIBLE'", [$local->ID_Local]);
+        }
+    // Retorna la vista con los locales y sus canchas
+        return view('welcome', ['locales' => $locales]);
     }
     public function reserva(Request $request){
         if (Auth::check()) {
+            $idusuario=auth()->user()->id;
             $reservas = $request->input('reservas', []);
             DB::beginTransaction();
             try {
@@ -46,7 +53,8 @@ class ReservaController extends Controller
                     $reservaId = DB::table('reservas')->insertGetId([
                         'Fecha_Reserva' => $reserva['fecha'],
                         'Hora_Inicio' => $reserva['horaInicio'],
-                        'Hora_Fin' => $reserva['horaFin']
+                        'Hora_Fin' => $reserva['horaFin'],
+                        'id' => $idusuario
                     ]);
     
                     // Relacionar cancha con reserva
