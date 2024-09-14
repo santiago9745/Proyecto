@@ -15,36 +15,38 @@
                         </div>
                     @endif
                     <div class="modal fade" id="ModalAgregar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Agregar Canchas</h1>
+                                    <h5 class="modal-title" id="exampleModalLabel">Agregar Canchas</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <form action="{{ route('cancha.create') }}" method="POST">
-                                        @csrf
-                                        <div id="canchas-container">
-                                            <!-- Campo inicial de cancha -->
-                                            <div class="cancha-group mb-3">
-                                                <label class="form-label">Nombre de la cancha</label>
-                                                <input type="text" class="form-control" name="canchas[0][nombre]" required>
-                                                <label class="form-label">Disponibilidad</label>
-                                                <select class="form-select" name="canchas[0][disponibilidad]" required>
-                                                    <option value="disponible">Disponible</option>
-                                                    <option value="no disponible">No Disponible</option>
-                                                </select>
-                                                <label class="form-label">Tipo de deporte</label>
-                                                <input type="text" class="form-control" name="canchas[0][tipo]" required>
-                                                <button type="button" class="btn btn-danger mt-2 remove-cancha">Eliminar</button>
-                                            </div>
-                                        </div>
-                                        <button type="button" class="btn btn-primary" id="add-cancha">Agregar otra cancha</button>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                            <button type="submit" class="btn btn-primary">Agregar</button>
-                                        </div>
-                                    </form>
+                                    <div style="max-height: 300px; overflow-y: auto;">
+                                    <!-- Tabla editable -->
+                                        <form id="canchasForm" method="POST" action="{{ route('cancha.create') }}">
+                                            @csrf
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Nombre de la Cancha</th>
+                                                        <th>Disponibilidad</th>
+                                                        <th>Tipo de Deporte</th>
+                                                        <th>Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="canchas-table">
+                                                    <!-- Aquí se agregan dinámicamente las filas -->
+                                                </tbody>
+                                            </table>
+                                            
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    <button type="button" id="addRow" class="btn btn-primary">Agregar Cancha</button>
+                                    <button type="button" id="saveCanchas" class="btn btn-success">Guardar</button>
                                 </div>
                             </div>
                         </div>
@@ -138,39 +140,37 @@
     </div>
 
     <script>
-        let counter = 1; // Para llevar un conteo de los grupos de canchas
+        let counter = 0; // Contador para las filas
 
-        document.getElementById('add-cancha').addEventListener('click', function() {
-            counter++;
-            const container = document.getElementById('canchas-container');
-            const newGroup = document.createElement('div');
-            newGroup.className = 'cancha-group mb-3';
-            newGroup.innerHTML = `
-                <label class="form-label">Nombre de la cancha</label>
-                <input type="text" class="form-control" name="canchas[${counter}][nombre]" required>
-                <label class="form-label">Disponibilidad</label>
-                <select class="form-select" name="canchas[${counter}][disponibilidad]" required>
-                    <option value="disponible">Disponible</option>
-                    <option value="no disponible">No Disponible</option>
-                </select>
-                <label class="form-label">Tipo de deporte</label>
-                <input type="text" class="form-control" name="canchas[${counter}][tipo]" required>
-                <button type="button" class="btn btn-danger mt-2 remove-cancha">Eliminar</button>
+        // Función para agregar una nueva fila a la tabla
+        document.getElementById('addRow').addEventListener('click', function() {
+            const tableBody = document.getElementById('canchas-table');
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td><input type="text" name="canchas[${counter}][nombre]" class="form-control" required></td>
+                <td>
+                    <select name="canchas[${counter}][disponibilidad]" class="form-control" required>
+                        <option value="disponible">Disponible</option>
+                        <option value="no disponible">No Disponible</option>
+                    </select>
+                </td>
+                <td><input type="text" name="canchas[${counter}][tipo]" class="form-control" required></td>
+                <td><button type="button" class="btn btn-danger remove-row">Eliminar</button></td>
             `;
-            container.appendChild(newGroup);
+            tableBody.appendChild(newRow);
 
-            // Agregar evento para eliminar el grupo de canchas
-            newGroup.querySelector('.remove-cancha').addEventListener('click', function() {
-                container.removeChild(newGroup);
+            counter++;
+
+            // Agregar el evento para eliminar la fila
+            newRow.querySelector('.remove-row').addEventListener('click', function() {
+                this.closest('tr').remove();
             });
         });
 
-        // Manejar la eliminación de canchas existentes
-        document.querySelectorAll('.remove-cancha').forEach(button => {
-            button.addEventListener('click', function() {
-                const group = this.closest('.cancha-group');
-                group.parentNode.removeChild(group);
-            });
+        // Función para guardar las canchas
+        document.getElementById('saveCanchas').addEventListener('click', function() {
+            document.getElementById('canchasForm').submit(); // Enviar el formulario
         });
     </script>
 @endsection

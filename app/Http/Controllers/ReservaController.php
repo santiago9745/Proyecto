@@ -9,9 +9,22 @@ use Illuminate\Support\Facades\Auth;
 class ReservaController extends Controller
 {
     public function index(){    
-        $locales = DB::select("SELECT L.ID_Local, L.nombre, L.direccion
-                           FROM locales L
-                           WHERE L.estado=1");
+        $locales = DB::select("SELECT
+                                L.ID_Local,
+                                L.nombre,
+                                L.direccion,
+                                M.URL
+                            FROM
+                                locales L
+                            LEFT JOIN
+                                multimedia M ON M.ID_Local = L.ID_Local
+                                AND M.ID_Multimedia = (
+                                    SELECT MAX(M2.ID_Multimedia)
+                                    FROM multimedia M2
+                                    WHERE M2.ID_Local = L.ID_Local
+                                )
+                            WHERE
+                                L.estado = 1;");
 
     
         foreach ($locales as $local) {
@@ -74,4 +87,41 @@ class ReservaController extends Controller
             return redirect()->route('login');
         }
     }
+    public function Reservas(){
+        $idlocal = auth()->user()->local;
+    $idUsuario = auth()->user()->id;
+
+    // Si el usuario tiene un local asignado
+    if (!empty($idlocal)) {
+        $sql = DB::select("SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva
+                            FROM locales l
+                            JOIN canchas c ON l.ID_Local = c.ID_Local
+                            JOIN detalle_reserva dr ON c.ID_Cancha = dr.ID_Cancha
+                            JOIN reservas r ON dr.ID_Reserva = r.ID_Reserva
+                            WHERE l.ID_Local = ?", [$idlocal]);
+
+    // Si el usuario NO tiene un local asignado
+    } else {
+        $sql = DB::select("SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva
+                            FROM reservas r
+                            WHERE r.id = ?", [$idUsuario]);
+    }
+        return view('.pages.reservas', ['sql' => $sql]);
+    }
+    public function update(Request $request, $id)
+    {
+        // Validar el estado de la reserva
+        $request->validate([
+            'Estado_Reserva' => 'required|in:Pendiente,Confirmada,Cancelada',
+        ]);
+
+        // Actualizar el estado de la reserva
+        DB::table('reservas')
+            ->where('ID_Reserva', $id)
+            ->update(['Estado_Reserva' => $request->Estado_Reserva]);
+
+        // Redirigir con mensaje de éxito
+        return redirect()->back()->with('success', 'Estado de la reserva actualizado correctamente.');
+    }   
+
 }

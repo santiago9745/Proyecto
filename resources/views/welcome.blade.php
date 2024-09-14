@@ -23,120 +23,97 @@
 
     <main>
         <section>
-            <div class="page-header min-vh-45">
-                @foreach ($locales as $local)
-                    <div class="container">   
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card-body">
-                                    <div class="square"> 
-                                        <h6 class="tituloLocales">{{ $local->nombre }}</h6>
-                                        <p class="parrafoLocales">{{ $local->direccion }}</p>
-                                        <div class="ps-4">
-                                            <!-- Modal con ID único para cada local -->
-                                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalAgregar{{ $local->ID_Local }}">
-                                                Agregar cancha
-                                            </button>
+            <div class="min-vh-45 mt-8">
+                <div class="container">
+                    <div class="row">
+                        @foreach ($locales as $local)
+                            <!-- Cada local será una columna de Bootstrap -->
+                            <div class="col-md-6 col-sm-6">
+                                <div class="card mb-5">
+                                    <img src="{{$local->URL ? asset($local->URL): asset('img/imagen.jpg')}}" class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ $local->nombre }}</h5>
+                                        <p class="card-text">{{ $local->direccion }}</p>
+                                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalAgregar{{ $local->ID_Local }}">
+                                                    Reservar Canchas
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <!-- Modal para agregar canchas al local actual -->
+                            <div class="modal fade" id="ModalAgregar{{ $local->ID_Local }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ $local->ID_Local }}" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel{{ $local->ID_Local }}">Agregar Reservas en {{ $local->nombre }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <!-- Contenedor Scrollable -->
+                                            <div style="max-height: 300px; overflow-y: auto;">
+                                                <form id="reservaForm-{{ $local->ID_Local }}" method="POST" action="{{ route('reserva') }}">
+                                                    @csrf
+                                                    <!-- Tabla Editable -->
+                                                    <table class="table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Cancha</th>
+                                                                <th>Fecha</th>
+                                                                <th>Hora Inicio</th>
+                                                                <th>Hora Fin</th>
+                                                                <th>Acciones</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="reserva-container-{{ $local->ID_Local }}">
+                                                            <!-- Filas dinámicas de reservas -->
+                                                        </tbody>
+                                                    </table>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                            <button type="button" id="add-reserva-{{ $local->ID_Local }}" class="btn btn-primary">Agregar Reserva</button>
+                                            <button type="submit" id="saveReservas-{{ $local->ID_Local }}" class="btn btn-success">Guardar</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Modal para agregar canchas al local actual -->
-                    <div class="modal fade" id="ModalAgregar{{ $local->ID_Local }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ $local->ID_Local }}" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h1 class="modal-title fs-5" id="exampleModalLabel{{ $local->ID_Local }}">Agregar Canchas en {{ $local->nombre }}</h1>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form action="{{ route('reserva') }}" method="POST">
-                                        @csrf
-                                        <div id="reserva-container-{{ $local->ID_Local }}">
-                                            <!-- Campo inicial de reserva -->
-                                            <div class="reserva-group mb-3">
-                                                <label class="form-label">Canchas disponibles</label>
-                                                <select class="form-select" name="reservas[0][canchas]" required>
-                                                    <option value="...">...</option>  
-                                                    @foreach ($local->canchas as $cancha)
-                                                        <option value="{{ $cancha->ID_Cancha }}">{{ $cancha->nombre }}</option>    
-                                                    @endforeach
-                                                </select>
-                                                <!-- Campos adicionales para la fecha y hora -->
-                                                <label class="form-label">Fecha de la reserva</label>
-                                                <input type="date" class="form-control" name="reservas[0][fecha]" required>
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <label class="form-label">Hora inicio</label>
-                                                        <select class="form-select" name="reservas[0][horaInicio]" required>
-                                                            @for ($i = 8; $i <= 20; $i += 0.5)
-                                                                @php
-                                                                    $hora = intval($i);
-                                                                    $minutos = ($i - $hora) * 60;
-                                                                    $horaFormateada = sprintf("%02d:%02d", $hora, $minutos);
-                                                                @endphp
-                                                                <option value="{{ $horaFormateada }}">{{ $horaFormateada }}</option>
-                                                            @endfor
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label class="form-label">Hora fin</label>
-                                                        <select class="form-select" name="reservas[0][horaFin]" required>
-                                                            @for ($i = 8; $i <= 20; $i += 0.5)
-                                                                @php
-                                                                    $hora = intval($i);
-                                                                    $minutos = ($i - $hora) * 60;
-                                                                    $horaFormateada = sprintf("%02d:%02d", $hora, $minutos);
-                                                                @endphp
-                                                                <option value="{{ $horaFormateada }}">{{ $horaFormateada }}</option>
-                                                            @endfor
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <button type="button" class="btn btn-danger mt-2 remove-cancha">Eliminar</button>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <!-- Botón para hacer otra reserva -->
-                                            <button type="button" class="btn btn-primary" id="add-reserva-{{ $local->ID_Local }}">Hacer otra reserva</button>
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                            <button type="submit" class="btn btn-primary">Agregar</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-                <button type="button" class="btn btn-primary" id="add-reserva">hacer otra reserva</button>
-            </div>    
+                        @endforeach
+                    </div> <!-- Cierra el contenedor de la fila -->
+                </div> <!-- Cierra el contenedor principal -->
+            </div> <!-- Cierra la página -->
         </section>
     </main>
+    <style>
+        .card-img-top {
+            width: 100%; /* Ajusta el ancho al 100% del contenedor */
+            height: 335px; /* Altura fija */
+            object-fit: cover; /* Ajusta la imagen para llenar el contenedor sin distorsión */
+        }
+    </style>
     <script>
-        @foreach ($locales as $local)
-            let counter{{ $local->ID_Local }} = 1; // Contador para las reservas del local actual
-    
-            document.getElementById('add-reserva-{{ $local->ID_Local }}').addEventListener('click', function() {
-                counter{{ $local->ID_Local }}++;
-                const container = document.getElementById('reserva-container-{{ $local->ID_Local }}');
-                const newGroup = document.createElement('div');
-                newGroup.className = 'reserva-group mb-3';
-                newGroup.innerHTML = `
-                    <label class="form-label">Canchas disponibles</label>
-                    <select class="form-select" name="reservas[${counter{{ $local->ID_Local }} }][canchas]" required>
-                        <option value="...">...</option>  
-                        @foreach ($local->canchas as $cancha)
-                            <option value="{{ $cancha->ID_Cancha }}">{{ $cancha->nombre }}</option>    
-                        @endforeach
-                    </select>
-                    <label class="form-label">Fecha de la reserva</label>
-                    <input type="date" class="form-control" name="reservas[${counter{{ $local->ID_Local }} }][fecha]" required>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label">Hora inicio</label>
+        document.addEventListener("DOMContentLoaded", function() {
+            @foreach ($locales as $local)
+                let counter{{ $local->ID_Local }} = 0; // Contador para las reservas del local actual
+        
+                // Función para agregar una nueva fila a la tabla
+                document.getElementById('add-reserva-{{ $local->ID_Local }}').addEventListener('click', function() {
+                    const tableBody = document.getElementById('reserva-container-{{ $local->ID_Local }}');
+                    const newRow = document.createElement('tr');
+        
+                    newRow.innerHTML = `
+                        <td>
+                            <select class="form-select" name="reservas[${counter{{ $local->ID_Local }} }][canchas]" required>
+                                <option value="">Selecciona una cancha</option>
+                                @foreach ($local->canchas as $cancha)
+                                    <option value="{{ $cancha->ID_Cancha }}">{{ $cancha->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td><input type="date" class="form-control" name="reservas[${counter{{ $local->ID_Local }} }][fecha]" required></td>
+                        <td>
                             <select class="form-select" name="reservas[${counter{{ $local->ID_Local }} }][horaInicio]" required>
                                 @for ($i = 8; $i <= 20; $i += 0.5)
                                     @php
@@ -147,9 +124,8 @@
                                     <option value="{{ $horaFormateada }}">{{ $horaFormateada }}</option>
                                 @endfor
                             </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Hora fin</label>
+                        </td>
+                        <td>
                             <select class="form-select" name="reservas[${counter{{ $local->ID_Local }} }][horaFin]" required>
                                 @for ($i = 8; $i <= 20; $i += 0.5)
                                     @php
@@ -160,25 +136,33 @@
                                     <option value="{{ $horaFormateada }}">{{ $horaFormateada }}</option>
                                 @endfor
                             </select>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-danger mt-2 remove-reserva">Eliminar</button>
-                `;
-                container.appendChild(newGroup);
+                        </td>
+                        <td><button type="button" class="btn btn-danger remove-reserva">Eliminar</button></td>
+                    `;
+                    tableBody.appendChild(newRow);
+        
+                    // Incrementa el contador para las próximas reservas
+                    counter{{ $local->ID_Local }}++;
+        
+                    // Agregar el evento para eliminar la fila de reserva
+                    newRow.querySelector('.remove-reserva').addEventListener('click', function() {
+                        this.closest('tr').remove(); // Elimina la fila
+                    });
+                });
+        
+                // Manejar la eliminación de filas existentes
+                document.querySelectorAll('.remove-reserva').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const row = this.closest('tr');
+                        row.parentNode.removeChild(row);
+                    });
+                });
     
-                // Agregar evento para eliminar el grupo de canchas
-                newGroup.querySelector('.remove-reserva').addEventListener('click', function() {
-                    container.removeChild(newGroup);
+                // Agregar evento de guardar reservas
+                document.getElementById('saveReservas-{{ $local->ID_Local }}').addEventListener('click', function() {
+                    document.getElementById('reservaForm-{{ $local->ID_Local }}').submit(); // Enviar el formulario
                 });
-            });
-            document.querySelectorAll('.remove-reserva').forEach(button => {
-                button.addEventListener('click', function() {
-                    const group = this.closest('.cancha-group');
-                    group.parentNode.removeChild(group);
-                });
-            });
-        @endforeach
+            @endforeach
+        });
     </script>
-
-
 @endsection

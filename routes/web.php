@@ -32,7 +32,6 @@ Route::get('/', function () {
 
 
 Route::group(['middleware' => 'auth.admin'], function () {
-    Route::get('/dashboard', [HomeController::class, 'index'])->name('welcome')->middleware('auth');
 	Route::get('/user-management', [ControllerCrud::class, 'index'])->name('crud.index');
 	Route::get('/locales', [CanchasController::class, 'index'])->name('crud.index');
 	Route::get('/canchas', [GestionCancha::class, 'index'])->name('crud.index');
@@ -40,14 +39,18 @@ Route::group(['middleware' => 'auth.admin'], function () {
 	Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
 	Route::get('/contenido', [ContenidoController::class, 'index'])->name('admin.index');
 });
+Route::get('/dashboard', [HomeController::class, 'index'])->name('welcome')->middleware('auth');
 Route::get('/', [ReservaController::class, 'index'])->name('home.index');
 Route::get('/reporteCanchas', [GestionCancha::class, 'pdf'])->name('reportesCanchas');
 Route::get('/reporteUtilidadCanchas', [GestionCancha::class, 'canchasUtilidad'])->name('reporteUtilidadCanchas');
 Route::get('/canchasLocales', [ReservaController::class, 'mostrarcanchas'])->name('mostrarcanchas');
+Route::get('/reservas', [ReservaController::class, 'Reservas'])->name('Reservas');
+Route::put('/reservas/{id}', [ReservaController::class, 'update'])->name('reservas.update');
 Route::post('/busqueda', [CanchasController::class, 'buscar'])->name('buscar');
 Route::post('/asignarUsuarios', [CanchasController::class, 'asignacion'])->name('local.asignacion');
 Route::post('/reservar', [ReservaController::class, 'reserva'])->name('reserva');
 Route::post('/contenido', [ContenidoController::class, 'subir'])->name('cancha.contenido');
+Route::post('/updateContenido-{id}', [ContenidoController::class, 'update'])->name('contenido.update');
 Route::post('/agregarLocal', [CanchasController::class, 'create'])->name('local.create');
 Route::post('/agregarCancha', [GestionCancha::class, 'agregar'])->name('cancha.create');
 Route::post('/updateLocal', [CanchasController::class, 'update'])->name('local.update');

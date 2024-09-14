@@ -5,7 +5,7 @@
             <nav class="navbar navbar-expand-lg blur border-radius-lg top-0 z-index-3 shadow position-absolute mt-4 py-2 start-0 end-0 mx-4">
                 <div class="container-fluid">
                     <a class="navbar-brand font-weight-bolder ms-lg-0 ms-3 " href="{{ route('home.index') }}">
-                        Home
+                        Inicio
                     </a>
                     <button class="navbar-toggler shadow-none ms-2" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navigation" aria-controls="navigation" aria-expanded="false"
@@ -16,7 +16,7 @@
                             <span class="navbar-toggler-bar bar3"></span>
                         </span>
                     </button>
-                    <div class="collapse navbar-collapse" id="navigation">
+                    <div class="navbar-nav justify-content-end">
                         <ul class="navbar-nav mx-auto">
                             @if (!Auth::check())
                             <li class="nav-item">
@@ -28,7 +28,7 @@
                             <li class="nav-item">
                                 <a class="nav-link me-2" href="{{ route('login') }}">
                                     <i class="fas fa-key opacity-6 text-dark me-1"></i>
-                                    Logearse
+                                    Iniciar sesion
                                 </a>
                             </li>
                             @else
@@ -43,19 +43,19 @@
                                     </a>
                                 </form>
                             </li>
-                            <li class="nav-item">
+                            {{-- <li class="nav-item">
                                 <a class="nav-link me-2" href="{{ route('login') }}">
                                     <i class="fas fa-key opacity-6 text-dark me-1"></i>
                                     Reservas activas
                                 </a>
-                            </li>
-                            <li class="nav-item ms-auto me-3">
+                            </li> --}}
+                            {{-- <li class="nav-item ms-auto me-3">
                                 <form action="{{ route('buscar') }}" method="POST" class="d-flex align-items-right">
                                     @csrf
                                     <input type="text" name="nombre" class="form-control flex-grow-1 me-2">
                                     <button type="submit" style="border: none; background-color: transparent"><i class="fas fa-search opacity-6 text-dark me-1"></i></button>
                                 </form>
-                            </li>
+                            </li> --}}
                             @endif
                             
                         </ul>

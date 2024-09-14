@@ -41,14 +41,14 @@
                     <span class="mask bg-primary opacity-6"></span>
                 </div>
             @endif
-            @if (auth()->user()->rol == 'admin' || auth()->user()->rol == 'cancha')
+            @if (auth()->user()->rol == 'admin' || auth()->user()->rol == 'cancha' || auth()->user()->rol == 'usuario')
                 @include('layouts.navbars.auth.sidenav')
             @endif
            
                 <main class="main-content border-radius-lg">
                     @yield('content')
+                    @include('layouts.footers.auth.footer')
                 </main>
-            @include('components.fixed-plugin')
         @endif
     @endauth
 
