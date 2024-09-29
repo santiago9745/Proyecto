@@ -94,4 +94,14 @@ class CanchasController extends Controller
                         ]);
         return view(".pages.busqueda")->with('sql', $sql);
     }
+    public function showMap()
+    {
+        // Obtén la lista de locales con sus coordenadas
+        $locales = DB::select("SELECT L.nombre AS nombreLocal, L.direccion, U.nombre AS nombreUsuario, U.email, U.telefono,L.latitud,L.longitud
+                                FROM locales L
+                                INNER JOIN users U ON L.ID_Local = U.local;");
+
+        // Pasa los datos de los locales a la vista
+        return view('.pages.mapa', ['locales' => $locales]);
+    }
 }

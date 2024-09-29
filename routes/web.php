@@ -39,6 +39,7 @@ Route::group(['middleware' => 'auth.admin'], function () {
 	Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
 	Route::get('/contenido', [ContenidoController::class, 'index'])->name('admin.index');
 });
+Route::get('/mapa', [CanchasController::class, 'showMap'])->name('mapa.locales');
 Route::get('/dashboard', [HomeController::class, 'index'])->name('welcome')->middleware('auth');
 Route::get('/', [ReservaController::class, 'index'])->name('home.index');
 Route::get('/reporteCanchas', [GestionCancha::class, 'pdf'])->name('reportesCanchas');
@@ -51,6 +52,7 @@ Route::post('/asignarUsuarios', [CanchasController::class, 'asignacion'])->name(
 Route::post('/reservar', [ReservaController::class, 'reserva'])->name('reserva');
 Route::post('/contenido', [ContenidoController::class, 'subir'])->name('cancha.contenido');
 Route::post('/updateContenido-{id}', [ContenidoController::class, 'update'])->name('contenido.update');
+Route::get('/eliminarImagen-{id}', [ContenidoController::class, 'eliminarImagen'])->name('eliminar.imagen');
 Route::post('/agregarLocal', [CanchasController::class, 'create'])->name('local.create');
 Route::post('/agregarCancha', [GestionCancha::class, 'agregar'])->name('cancha.create');
 Route::post('/updateLocal', [CanchasController::class, 'update'])->name('local.update');

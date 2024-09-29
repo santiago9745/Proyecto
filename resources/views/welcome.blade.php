@@ -51,7 +51,7 @@
                                         </div>
                                         <div class="modal-body">
                                             <!-- Contenedor Scrollable -->
-                                            <div style="max-height: 300px; overflow-y: auto;">
+                                            <div style="max-height: 400px; overflow-y: auto;">
                                                 <form id="reservaForm-{{ $local->ID_Local }}" method="POST" action="{{ route('reserva') }}">
                                                     @csrf
                                                     <!-- Tabla Editable -->

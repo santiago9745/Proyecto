@@ -2,44 +2,91 @@
 
 @section('content')
     @include('layouts.navbars.auth.topnav', ['title' => 'Previzulizacion del contenido'])
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <style>
+        #mi_mapa{
+            height: 400px;
+            width: 800px ;
+        }
+    </style>
     <div class="container-fluid py-4">
         @foreach ($locales as $row)
             <div class="row">
                 <div class="col-md-8">
-                        <div class="card">
-                            <form role="form" method="POST" action={{ route('contenido.update',$row->ID_Local) }} enctype="multipart/form-data">
-                                @csrf
-                                <div class="card-header pb-0">
-                                    <div class="d-flex align-items-center">
-                                        <p class="mb-0">Editar Local</p>
-                                        <button type="submit" class="btn btn-primary btn-sm ms-auto">Guardar</button>
-                                    </div>
+                    <div class="card">
+                        <form role="form" method="POST" action={{ route('contenido.update',$row->ID_Local) }} enctype="multipart/form-data">
+                            @csrf
+                            <div class="card-header pb-0">
+                                <div class="d-flex align-items-center">
+                                    <p class="mb-0">Editar Local</p>
+                                    <button type="submit" class="btn btn-primary btn-sm ms-auto">Guardar</button>
                                 </div>
-                                <div class="card-body">
-                                    <p class="text-uppercase text-sm">Informacion del Local</p>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="example-text-input" class="form-control-label">Nombre del Local</label>
-                                                <input class="form-control" type="text" name="nombre" value="{{$row->nombre}}">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="example-text-input" class="form-control-label">Direccion</label>
-                                                <input class="form-control" type="text" name="direccion" value="{{$row->direccion}}">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="imagen" class="form-control-label">Imagen</label>
-                                                <input class="form-control" type="file" id="imagen" name="imagen" accept="image/jpeg, image/png">
-                                            </div>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-uppercase text-sm">Informacion del Local</p>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Nombre del Local</label>
+                                            <input class="form-control" type="text" name="nombre" value="{{$row->nombre}}">
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Informacion de direccion</label>
+                                            <input class="form-control" type="text" name="direccion" value="{{$row->direccion}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="imagen" class="form-control-label">Imagenes</label>
+                                            <input class="form-control" type="file" id="imagen" name="imagenes[]" accept="image/jpeg, image/png" multiple>
+                                        </div>
+                                    </div>
+                                    
+                                        
+                                    <input type="hidden" name="latitud" id="latitude_field" value="{{ $row->latitud ?? '' }}">
+                                    <input type="hidden" name="longitud" id="longitude_field" value="{{ $row->longitud ?? '' }}">
+
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalAgregar">
+                                Mostrar todas las imagenes
+                            </button>   
+                            <div class="modal fade" id="ModalAgregar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Imagenes del local</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            <h5 class="modal-title mb-3">Imágenes del local</h5>
+                                            <div style="max-height: 500px; overflow-y: auto; padding: 10px;">
+                                                <div class="row">
+                                                    @foreach ($imagenes as $imagen)
+                                                        <div class="col-6 col-md-4 mb-3"> <!-- Ajuste de columnas para una mejor presentación -->
+                                                            <div class="card">
+                                                                <img src="{{ $imagen->URL }}" alt="Imagen del local" class="card-img-top img-thumbnail" style="width: 100%; height: auto;">
+                                                                <div class="card-body text-center">
+                                                                    <a href="{{ route('eliminar.imagen', $imagen->ID_Multimedia) }}" onclick="return confirm('¿Estás seguro de que deseas eliminar esta imagen?');" class="btn btn-danger btn-sm">Eliminar</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>       
+                            <label for="example-text-input" class="form-control-label">Ubicacion del local</label>       
+                            <div id="mi_mapa" data-lat="{{ $row->latitud ?? '' }}" data-lng="{{ $row->longitud ?? '' }}"></div>
+                    </div>    
                 </div>
                 <div class="col-md-4">
                     <div class="card card-profile">
@@ -66,4 +113,46 @@
             </div>    
         @endforeach
     </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        // Inicializar el mapa con la latitud y longitud que vienen desde la base de datos
+        let initialLat = parseFloat(document.getElementById('mi_mapa').getAttribute('data-lat'));
+        let initialLng = parseFloat(document.getElementById('mi_mapa').getAttribute('data-lng'));
+        let initialZoom = initialLat && initialLng ? 15 : 13; // Zoom más cerca si hay un marcador
+    
+        let map = L.map('mi_mapa').setView([initialLat || -17.392651, initialLng || -66.158681], initialZoom);
+    
+        // Añadir las capas del mapa
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+    
+        let marker;
+    
+        // Inicializar los campos ocultos con los valores actuales del local
+        document.getElementById('latitude_field').value = initialLat;
+        document.getElementById('longitude_field').value = initialLng;
+    
+        // Si ambos atributos de latitud y longitud están presentes, añadir un marcador
+        if (initialLat && initialLng) {
+            marker = L.marker([initialLat, initialLng]).addTo(map);
+        }
+    
+        // Añadir un evento de clic para actualizar o añadir un marcador
+        map.on('click', function(e) {
+            let latitude = e.latlng.lat;
+            let longitude = e.latlng.lng;
+    
+            // Actualizar campos ocultos solo si se ha hecho clic en el mapa
+            document.getElementById('latitude_field').value = latitude;
+            document.getElementById('longitude_field').value = longitude;
+    
+            // Remover marcador existente si hay uno y añadir uno nuevo
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            marker = L.marker([latitude, longitude]).addTo(map);
+        });
+    </script>
+    
 @endsection

@@ -93,34 +93,35 @@ class ReservaController extends Controller
 
     // Si el usuario tiene un local asignado
     if (!empty($idlocal)) {
-        $sql = DB::select("SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva
+        $sql = DB::select("SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,u.nombre AS usuario_nombre, u.email AS usuario_email, u.primerApellido, u.segundoApellido
                             FROM locales l
                             JOIN canchas c ON l.ID_Local = c.ID_Local
                             JOIN detalle_reserva dr ON c.ID_Cancha = dr.ID_Cancha
                             JOIN reservas r ON dr.ID_Reserva = r.ID_Reserva
+                            JOIN users u ON r.id = u.id 
                             WHERE l.ID_Local = ?", [$idlocal]);
 
     // Si el usuario NO tiene un local asignado
     } else {
-        $sql = DB::select("SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva
+        $sql = DB::select("SELECT L.nombre,r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,L.latitud,L.longitud
                             FROM reservas r
+                            INNER JOIN detalle_reserva D ON D.ID_Reserva=r.ID_Reserva
+                            INNER JOIN canchas C ON C.ID_Cancha=D.ID_Cancha
+                            INNER JOIN locales L ON L.ID_Local=C.ID_Local 
                             WHERE r.id = ?", [$idUsuario]);
     }
         return view('.pages.reservas', ['sql' => $sql]);
     }
     public function update(Request $request, $id)
     {
-        // Validar el estado de la reserva
         $request->validate([
             'Estado_Reserva' => 'required|in:Pendiente,Confirmada,Cancelada',
         ]);
 
-        // Actualizar el estado de la reserva
         DB::table('reservas')
             ->where('ID_Reserva', $id)
             ->update(['Estado_Reserva' => $request->Estado_Reserva]);
 
-        // Redirigir con mensaje de éxito
         return redirect()->back()->with('success', 'Estado de la reserva actualizado correctamente.');
     }   
 

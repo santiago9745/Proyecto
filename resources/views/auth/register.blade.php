@@ -17,7 +17,7 @@
                             <img src="/assets/img/young-people-playing-basketball.jpg" alt="Imagen deportiva 2">
                         </div>
                     <div class="row justify-content-center">
-                        <div class="col-md-4">
+                        <div class="col-md-8">
                             <div class="card card-plain card-border">
                                 <div class="form-conteiner">
                                     <div class="card-header pb-0 text-start">
@@ -38,13 +38,21 @@
                                                 <input type="text" name="nombre" class="form-control" placeholder="Nombre" aria-label="Name" value="{{ old('nombre') }}" >
                                                 @error('nombre') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
                                             </div>
-                                            <div class="flex flex-col mb-3">
-                                                <input type="text" name="primerApellido" class="form-control" placeholder="Primer Apellido" aria-label="Name" value="{{ old('primerApellido') }}" >
-                                                @error('primerApellido') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <input type="text" name="primerApellido" class="form-control" placeholder="Primer Apellido" aria-label="Name" value="{{ old('primerApellido') }}" >
+                                                    @error('primerApellido') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <input type="text" name="segundoApellido" class="form-control" placeholder="Segundo Apellido" aria-label="Name" value="{{ old('segundoApellido') }}" >
+                                                    @error('segundoApellido') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
+                                                </div>
                                             </div>
                                             <div class="flex flex-col mb-3">
-                                                <input type="text" name="segundoApellido" class="form-control" placeholder="Segundo Apellido" aria-label="Name" value="{{ old('segundoApellido') }}" >
-                                                @error('segundoApellido') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
+                                            </div>
+                                            <div class="flex flex-col mb-3">
+                                                <input type="text" name="telefono" class="form-control" placeholder="Telefono" aria-label="Name" value="{{ old('telefono') }}" >
+                                                @error('telefono') <p class='text-danger text-xs pt-1'> {{ $message }} </p> @enderror
                                             </div>
                                             <div class="flex flex-col mb-3">
                                                 <input type="email" name="email" class="form-control" placeholder="Correo Electronico" aria-label="Email" value="{{ old('email') }}" >

@@ -41,7 +41,7 @@
                                                 <label class="form-check-label" for="rememberMe">Acuérdate de mi</label>
                                             </div>
                                             <div class="text-center">
-                                                <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
+                                                <button type="submit" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Iniciar sesion</button>
                                             </div>
                                         </form>
                                     </div>
