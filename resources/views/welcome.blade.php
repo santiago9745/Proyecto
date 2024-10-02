@@ -30,13 +30,61 @@
                             <!-- Cada local será una columna de Bootstrap -->
                             <div class="col-md-6 col-sm-6">
                                 <div class="card mb-5">
-                                    <img src="{{$local->URL ? asset($local->URL): asset('img/imagen.jpg')}}" class="card-img-top" alt="...">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ $local->nombre }}</h5>
-                                        <p class="card-text">{{ $local->direccion }}</p>
-                                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalAgregar{{ $local->ID_Local }}">
-                                                    Reservar Canchas
+                                    <div id="carousel{{ $local->ID_Local }}" class="carousel slide" data-bs-ride="carousel">
+                                        <div class="carousel-inner" style="min-height: 300px;">
+                                            @if (count($local->imagenes) > 0)
+                                                @foreach ($local->imagenes as $index => $imagen)
+                                                    <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                                        <img src="{{ $imagen->URL }}" class="d-block w-100 img-fluid" alt="Imagen del local" style="object-fit: contain; max-height: 300px;">
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <!-- Si no hay imágenes, muestra una imagen por defecto -->
+                                                <div class="carousel-item active">
+                                                    <img src="{{  asset('img/imagen.jpg') }}" class="d-block w-100 img-fluid" alt="Imagen por defecto" style="object-fit: contain; max-height: 300px;">
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ $local->ID_Local }}" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Previous</span>
                                         </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ $local->ID_Local }}" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Next</span>
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="text-center mt-4">
+                                            <!-- Nombre del local con un icono de localización -->
+                                                <h5>{{ $local->nombre }}</h5> <!-- Nombre del local -->
+                                                <p><strong>Propietario:</strong> {{ $local->nombreCompleto }}</p> <!-- Nombre completo del propietario -->
+                                                <p><strong>Teléfono:</strong> {{ $local->telefono }}</p> <!-- Teléfono del propietario -->
+                                            
+                                            <!-- Divider para separación de contenido -->
+                                            <hr class="my-4">
+                                    
+                                            <!-- Dirección con icono de dirección -->
+                                            <div class="h6 font-weight-light">
+                                                <i class="fas fa-map-signs text-muted"></i> {{ $local->direccion }}
+                                            </div>
+                                    
+                                            <!-- Latitud y Longitud del local -->
+                                            <div class="h6 mt-2">
+                                                <i class="fas fa-globe-americas text-muted"></i> Coordenadas: 
+                                                <span class="text-muted">{{ $local->latitud }}, {{ $local->longitud }}</span>
+                                            </div>
+                                    
+                                            <!-- Botones de acción -->
+                                            <div class="mt-4">
+                                                <a href="#" class="btn btn-sm btn-info">Ver detalles</a>
+                                                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#ModalAgregar{{ $local->ID_Local }}">
+                                                    Reservar Canchas
+                                                </button>
+                                                <a href="https://maps.google.com/?q={{ $local->latitud }},{{ $local->longitud }}" target="_blank" class="btn btn-sm btn-success">Ver en el mapa</a>
+                                            </div>
+                                        </div>
+                                        
                                     </div>
                                 </div>
                             </div>

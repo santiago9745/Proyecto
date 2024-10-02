@@ -61,7 +61,6 @@
                                             <h5 class="modal-title" id="exampleModalLabel">Imagenes del local</h5>
                                         </div>
                                         <div class="modal-body">
-                                            <h5 class="modal-title mb-3">Imágenes del local</h5>
                                             <div style="max-height: 500px; overflow-y: auto; padding: 10px;">
                                                 <div class="row">
                                                     @foreach ($imagenes as $imagen)
@@ -90,24 +89,54 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card card-profile">
-                        <img src="{{ $row->URL }}" alt="Image placeholder" class="card-img-top">
-                        
+                        <!-- Carrusel de Bootstrap -->
+                        <div id="carouselLocal{{ $row->ID_Local }}" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner" style="min-height: 300px;">
+                                @foreach ($imagenes as $index => $imagen)
+                                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                                    <img src="{{ $imagen->URL }}" class="d-block w-100 img-fluid" alt="Imagen del local" style="object-fit: contain; max-height: 300px;">
+                                </div>
+                                @endforeach
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselLocal{{ $row->ID_Local }}" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Anterior</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselLocal{{ $row->ID_Local }}" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Siguiente</span>
+                            </button>
+                        </div>
+                
                         <div class="card-body pt-0">
                             <div class="text-center mt-4">
-                                <h5>
-                                    {{ $row->nombre }}
-                                </h5>
-                                {{-- <div class="h6 font-weight-300">
-                                    <i class="ni location_pin mr-2"></i>Bucharest, Romania
+                                <!-- Nombre del local con un icono de localización -->
+                                    <h5>{{ $row->nombre }}</h5> <!-- Nombre del local -->
+                                    <p><strong>Propietario:</strong> {{ $row->nombreCompleto }}</p> <!-- Nombre completo del propietario -->
+                                    <p><strong>Teléfono:</strong> {{ $row->telefono }}</p> <!-- Teléfono del propietario -->
+                                
+                                <!-- Divider para separación de contenido -->
+                                <hr class="my-4">
+                        
+                                <!-- Dirección con icono de dirección -->
+                                <div class="h6 font-weight-light">
+                                    <i class="fas fa-map-signs text-muted"></i> {{ $row->direccion }}
                                 </div>
-                                <div class="h6 mt-4">
-                                    <i class="ni business_briefcase-24 mr-2"></i>Solution Manager - Creative Tim Officer
+                        
+                                <!-- Latitud y Longitud del local -->
+                                <div class="h6 mt-2">
+                                    <i class="fas fa-globe-americas text-muted"></i> Coordenadas: 
+                                    <span class="text-muted">{{ $row->latitud }}, {{ $row->longitud }}</span>
                                 </div>
-                                <div>
-                                    <i class="ni education_hat mr-2"></i>University of Computer Science
-                                </div> --}}
+                        
+                                <!-- Botones de acción -->
+                                <div class="mt-4">
+                                    <a href="#" class="btn btn-sm btn-info">Ver detalles</a>
+                                    <a href="https://maps.google.com/?q={{ $row->latitud }},{{ $row->longitud }}" target="_blank" class="btn btn-sm btn-success">Ver en el mapa</a>
+                                </div>
                             </div>
                         </div>
+                        
                     </div>
                 </div>
             </div>    

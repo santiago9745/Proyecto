@@ -10,10 +10,11 @@ class ContenidoController extends Controller
 {
     public function index(){
         $idlocal=auth()->user()->local;
-        $locales = DB::select("SELECT L.ID_Local, L.nombre, L.direccion, M.URL, L.latitud, L.longitud
+        $locales = DB::select("SELECT L.ID_Local, L.nombre, L.direccion, M.URL, L.latitud, L.longitud,U.telefono,CONCAT(U.nombre,' ',U.primerApellido,' ',segundoApellido) AS nombreCompleto
                            FROM locales L
                            LEFT JOIN multimedia M ON M.ID_Local=L.ID_Local
-                           WHERE L.estado=1 AND L.ID_Local=$idlocal 
+                           INNER JOIN users U ON L.ID_Local = U.local
+                           WHERE L.estado=1 AND L.ID_Local=$idlocal
                            ORDER BY L.ID_Local, L.nombre, L.direccion, M.URL DESC LIMIT 1");
         $imagenes = DB::select("SELECT M.ID_Multimedia, M.URL
         FROM multimedia M

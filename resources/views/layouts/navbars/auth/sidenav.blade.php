@@ -77,33 +77,32 @@
                 </li>
             @endif
             @if (auth()->user()->rol == 'usuario')
-            <li class="nav-item">
-                <a class="nav-link {{ Route::currentRouteName() == 'home.index' ? 'active' : '' }}" href="{{ route('home.index') }}">
-                    <div
-                        class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Dashboard</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ str_contains(request()->url(), 'reservas') == true ? 'active' : '' }}" href="{{ route('page', ['page' => 'reservas']) }}">
-                    <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-bullet-list-67 text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Reservas activas</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ str_contains(request()->url(), 'mapa') == true ? 'active' : '' }}" href="{{ route('page', ['page' => 'mapa']) }}">
-                    <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="ni ni-bullet-list-67 text-dark text-sm opacity-10"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Mapa de locales</span>
-                </a>
-            </li>
-                
+                <li class="nav-item">
+                    <a class="nav-link {{ Route::currentRouteName() == 'home.index' ? 'active' : '' }}" href="{{ route('home.index') }}">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-house-user text-primary text-sm opacity-10"></i> <!-- Icono de casita de Font Awesome -->
+                        </div>
+                        <span class="nav-link-text ms-1">Inicio</span> 
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'reservas') ? 'active' : '' }}" href="{{ route('page', ['page' => 'reservas']) }}">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-calendar-grid-58 text-dark text-sm opacity-10"></i> <!-- Icono de reservas -->
+                        </div>
+                        <span class="nav-link-text ms-1">Reservas activas</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'mapa') ? 'active' : '' }}" href="{{ route('page', ['page' => 'mapa']) }}">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-map-big text-dark text-sm opacity-10"></i> <!-- Icono de mapa -->
+                        </div>
+                        <span class="nav-link-text ms-1">Mapa de locales</span>
+                    </a>
+                </li>
             @endif
+
         </ul>
     </div>
 </aside>

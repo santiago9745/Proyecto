@@ -13,7 +13,11 @@ class ReservaController extends Controller
                                 L.ID_Local,
                                 L.nombre,
                                 L.direccion,
-                                M.URL
+                                L.latitud,
+                                L.longitud,
+                                M.URL,
+                                U.telefono,
+                                CONCAT(U.nombre,' ',U.primerApellido, ' ', U.segundoApellido) AS nombreCompleto
                             FROM
                                 locales L
                             LEFT JOIN
@@ -23,11 +27,14 @@ class ReservaController extends Controller
                                     FROM multimedia M2
                                     WHERE M2.ID_Local = L.ID_Local
                                 )
+                            INNER JOIN users U ON L.ID_Local = U.local
                             WHERE
                                 L.estado = 1;");
-
-    
         foreach ($locales as $local) {
+            $local->imagenes = DB::select("SELECT M.URL
+                                        FROM multimedia M
+                                        WHERE M.ID_Local = ?",
+                                        [$local->ID_Local]);
         // Obtener las canchas asociadas a este local
         $local->canchas = DB::select("SELECT *
                                       FROM canchas
