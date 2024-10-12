@@ -46,7 +46,7 @@ class ForgotPassword extends Notification
     {
         $url = URL::temporarySignedRoute('change-password', now()->addHours(12) ,['id' => $this->token]);
         return (new MailMessage)
-                    ->line('Hi!')
+                    ->line('Hola!')
                     ->subject('Cambio de contraseña')
                     ->line('Estás recibiendo este correo electrónico para que puedas restablecer la contraseña de tu cuenta')
                     ->action('restablecer la contraseña', $url )

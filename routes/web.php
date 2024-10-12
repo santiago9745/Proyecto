@@ -23,6 +23,7 @@ use App\Http\Controllers\GestionCancha;
 use App\Http\Controllers\ContenidoController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\NotificacionController;
             
 
 
@@ -43,6 +44,8 @@ Route::get('/mapa', [CanchasController::class, 'showMap'])->name('mapa.locales')
 Route::get('/dashboard', [HomeController::class, 'index'])->name('welcome')->middleware('auth');
 Route::get('/', [ReservaController::class, 'index'])->name('home.index');
 Route::get('/reporteCanchas', [GestionCancha::class, 'pdf'])->name('reportesCanchas');
+Route::get('/notificaciones', [NotificacionController::class, 'index'])->name('notificacionindex');
+Route::post('/enviar-notificacion', [NotificacionController::class, 'enviarNotificacion'])->name('notificacion.enviar');
 Route::get('/reporteUtilidadCanchas', [GestionCancha::class, 'canchasUtilidad'])->name('reporteUtilidadCanchas');
 Route::get('/canchasLocales', [ReservaController::class, 'mostrarcanchas'])->name('mostrarcanchas');
 Route::get('/reservas', [ReservaController::class, 'Reservas'])->name('Reservas');

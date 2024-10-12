@@ -2,9 +2,7 @@
 
 @section('content')
     @include('layouts.navbars.auth.topnav', ['title' => 'Tu Perfil'])
-    <div id="alert">
-        @include('components.alert')
-    </div>
+
     <div class="container-fluid py-4">
         <div class="row">
             <div class="col-md-8">
@@ -34,7 +32,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="example-text-input" class="form-control-label">Nombre</label>
+                                        <label for="example-text-input" class="form-control-label">Nombres</label>
                                         <input class="form-control" type="text" name="nombre"  value="{{ old('nombre', auth()->user()->nombre) }}">
                                     </div>
                                 </div>
@@ -47,7 +45,13 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="example-text-input" class="form-control-label">Segundo Apellido</label>
-                                        <input class="form-control" type="text" name="segundoApellido" value="{{ old('primerApellido', auth()->user()->segundoApellido) }}">
+                                        <input class="form-control" type="text" name="segundoApellido" value="{{ old('segundoApellido', auth()->user()->segundoApellido) }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="example-text-input" class="form-control-label">Numero de celular</label>
+                                        <input class="form-control" type="text" name="telefono" value="{{ old('telefono', auth()->user()->telefono) }}">
                                     </div>
                                 </div>
                             </div>
