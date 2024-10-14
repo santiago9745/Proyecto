@@ -3,17 +3,22 @@
 @section('content')
     @include('layouts.navbars.auth.topnav', ['title' => 'Reservas registradas'])
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css" rel="stylesheet" />
+
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+
     <style>
-        #mi_mapa{
+        #mi_mapa {
             height: 400px;
-            width: 750px ;
+            width: 750px;
         }
         .tooltip-inner {
-        max-width: 300px; /* Ancho máximo */
-        font-size: 14px;  /* Tamaño de fuente más grande */
-        white-space: pre-line; /* Respeta los saltos de línea */
-    }
+            max-width: 300px; /* Ancho máximo */
+            font-size: 14px;  /* Tamaño de fuente más grande */
+            white-space: pre-line; /* Respeta los saltos de línea */
+        }
     </style>
+
     <div class="row mt-4 mx-4">
         <div class="col-12">
             <div class="card mb-4">
@@ -22,134 +27,143 @@
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
-                            <thead>
-                                <tr>
-                                    @if (empty(auth()->user()->local))
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre del local</th>
-                                    @endif
-                                    
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fecha de Reserva</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Hora Inicio</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Hora Fin</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Estado de la Reserva</th>
-                                    @if (empty(auth()->user()->local))
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Direccion de local</th>
-                                    @else
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Comunicarse con el cliente</th>
-                                    @endif
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($sql as $row)
-                                @if (!empty(auth()->user()->local))
-                                    <tr class="align-middle text-center" 
-                                    data-bs-toggle="tooltip" 
-                                    title="Nombre completo: {{ $row->usuario_nombre }} {{ $row->primerApellido }} {{ $row->segundoApellido }}&#10;Correo: {{ $row->usuario_email }}">
-                                @else
-                                    <tr>
-                                @endif
-
-                                        @if (empty(auth()->user()->local))
-                                            <td class="align-middle text-center">
-                                                <span class="text-xs font-weight-bold">{{ $row->nombre}}</span>
-                                            </td>
-                                        @endif
-                                        <td class="align-middle text-center">
-                                            <span class="text-xs font-weight-bold">{{ $row->Fecha_Reserva }}</span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                            <span class="text-xs font-weight-bold">{{ $row->Hora_Inicio }}</span>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                            <span class="text-xs font-weight-bold">{{ $row->Hora_Fin }}</span>
-                                        </td>
-                                        @if (!empty(auth()->user()->local))
-                                            <td class="align-middle text-center">
-                                                <form action="{{ route('reservas.update', $row->ID_Reserva) }}" method="POST">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <select name="Estado_Reserva" class="form-control" onchange="this.form.submit()">
-                                                        <option value="Pendiente" {{ $row->Estado_Reserva == 'Pendiente' ? 'selected' : '' }}>Pendiente</option>
-                                                        <option value="Confirmada" {{ $row->Estado_Reserva == 'Confirmada' ? 'selected' : '' }}>Confirmada</option>
-                                                        <option value="Cancelada" {{ $row->Estado_Reserva == 'Cancelada' ? 'selected' : '' }}>Cancelada</option>
-                                                    </select>
-                                                </form>
-                                            </td>
-                                            <td>
-                                                <!-- Botón para abrir WhatsApp con el cliente -->
-                                                <a href="https://wa.me/59179707164?text=Hola%20{{ urlencode($row->usuario_nombre) }},%20gracias%20por%20reservar%20con%20nosotros.%20Tu%20reserva%20es%20para%20el%20{{ $row->Fecha_Reserva }}%20a%20las%20{{ $row->Hora_Inicio }}" 
-                                                   target="_blank" 
-                                                   class="btn btn-success">
-                                                   Comunícate por WhatsApp
-                                                </a>
-                                            </td>
-                                        @else
-                                            <td class="align-middle text-center">
-                                                <span class="text-xs font-weight-bold">{{ $row->Estado_Reserva }}</span>
-                                            </td>
-                                        @endif
-                                        <td class="aling-middle text-center">
-                                            @if (empty(auth()->user()->local))
-                                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalDireccion">
-                                                    <i class="fas fa-map-marker-alt"></i> Ubicacion del local
-                                                </button>  
-                                            @endif 
-                                            <div class="modal fade" id="ModalDireccion" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                                <div class="modal-dialog modal-lg">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="exampleModalLabel">Imagenes del local</h5>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <!-- Contenedor Scrollable -->
-                                                                <div id="mi_mapa" data-lat="{{ $row->latitud ?? '' }}" data-lng="{{ $row->longitud ?? '' }}"></div>
-                                                            
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div> 
-                                        </td>
-                                    </tr>
-                                    
-                                @endforeach
-                            </tbody>
-                        </table>
+                        <div id="calendar"></div>
                     </div>
                 </div>
             </div>        
         </div>
     </div>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Modal de información de la reserva -->
+    <div class="modal fade" id="modalInfoReserva" tabindex="-1" aria-labelledby="modalInfoReservaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalInfoReservaLabel">Detalles de la Reserva</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="infoReservaContent">
+                    @if (empty(auth()->user()->local))
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalDireccion">
+                            <i class="fas fa-map-marker-alt"></i> Ubicacion del local
+                        </button>  
+                    @endif 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Inicializar el mapa
-        let initialLat = parseFloat(document.getElementById('mi_mapa').getAttribute('data-lat'));
-        let initialLng = parseFloat(document.getElementById('mi_mapa').getAttribute('data-lng'));
-        let initialZoom = initialLat && initialLng ? 15 : 13; // Zoom más cerca si hay un marcador
-    
-        let map = L.map('mi_mapa').setView([initialLat || -17.392651, initialLng || -66.158681], initialZoom);
-    
-        // Añadir las capas del mapa
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-    
-        let marker;
-    
-        // Si ambos atributos de latitud y longitud están presentes, añadir un marcador
-        if (initialLat && initialLng) {
-            marker = L.marker([initialLat, initialLng]).addTo(map);
-        }
-    
-        // Cuando el modal se muestra completamente, recalculamos el tamaño del mapa
-        document.getElementById('ModalDireccion').addEventListener('shown.bs.modal', function () {
-            setTimeout(function() {
-                map.invalidateSize(); // Recalcula el tamaño del mapa cuando el modal está visible
-            }, 100); // Pequeño retraso para asegurarse de que el modal esté completamente visible
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es',
+            events: [
+                @foreach($sql as $row)
+                {
+                    title: `@if (!empty(auth()->user()->local))
+                                {{ $row->usuario_nombre }} {{ $row->primerApellido }} {{ $row->segundoApellido }}
+                            @else
+                                {{ $row->nombre }}
+                            @endif`,
+                    start: '{{ $row->Fecha_Reserva }}T{{ $row->Hora_Inicio }}',
+                    end: '{{ $row->Fecha_Reserva }}T{{ $row->Hora_Fin }}',
+                    color: '{{ $row->Estado_Reserva == "Confirmada" ? "green" : ($row->Estado_Reserva == "Pendiente" ? "orange" : "red") }}',
+                    extendedProps: {
+                        @if (empty(auth()->user()->local))
+                            nombreLocal: '{{ $row->nombre }}',
+                        @endif
+                        fechaReserva: '{{ $row->Fecha_Reserva }}',
+                        horaInicio: '{{ $row->Hora_Inicio }}',
+                        horaFin: '{{ $row->Hora_Fin }}',
+                        estadoReserva: '{{ $row->Estado_Reserva }}',
+                        @if (!empty(auth()->user()->local)) 
+                            nombreCliente: '{{ $row->usuario_nombre }}',
+                            emailCliente: '{{ $row->usuario_email }}',
+                        @endif
+                        @if (empty(auth()->user()->local))
+                            latitud: '{{ $row->latitud }}',
+                            longitud: '{{ $row->longitud }}',
+                        @endif
+                        idReserva: '{{ $row->ID_Reserva }}' // Agregamos el ID de la reserva aquí
+                    }
+                },
+                @endforeach
+            ],
+            eventClick: function(info) {
+                var props = info.event.extendedProps;
+
+                // Mostrar los detalles de la reserva
+                document.getElementById('infoReservaContent').innerHTML = `
+                    ${props.nombreLocal ? `<p><strong>Nombre del Local:</strong> ${props.nombreLocal}</p>` : ''}
+                    <p><strong>Fecha de Reserva:</strong> ${props.fechaReserva}</p>
+                    <p><strong>Hora de Inicio:</strong> ${props.horaInicio}</p>
+                    <p><strong>Hora de Fin:</strong> ${props.horaFin}</p>
+                    <p><strong>Estado de Reserva:</strong> ${props.estadoReserva}</p>
+                    ${!props.nombreLocal ? `<p><strong>Nombre del Cliente:</strong> ${props.nombreCliente}</p>` : ''}
+                    ${!props.nombreLocal ? `<p><strong>Email del Cliente:</strong> ${props.emailCliente}</p>` : ''}
+                `;
+
+                // Sección de formulario y WhatsApp
+                document.getElementById('infoReservaContent').innerHTML += `
+                    @if (!empty(auth()->user()->local))
+                        <form action="/reservas/${props.idReserva}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <select name="Estado_Reserva" class="form-control" onchange="this.form.submit()">
+                                <option value="Pendiente" ${props.estadoReserva === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                                <option value="Confirmada" ${props.estadoReserva === 'Confirmada' ? 'selected' : ''}>Confirmada</option>
+                                <option value="Cancelada" ${props.estadoReserva === 'Cancelada' ? 'selected' : ''}>Cancelada</option>
+                            </select>
+                        </form>
+                        <a href="https://wa.me/591${props.telefonoCliente}?text=Hola%20${encodeURIComponent(props.nombreCliente)},%20gracias%20por%20reservar%20con%20nosotros.%20Tu%20reserva%20es%20para%20el%20${props.fechaReserva}%20a%20las%20${props.horaInicio}" 
+                            target="_blank" 
+                            class="btn btn-success mt-2">
+                            Comunícate por WhatsApp
+                        </a>
+                    @else
+                        <p><strong>Estado actual:</strong> ${props.estadoReserva}</p>
+                        ${props.latitud && props.longitud ? `<div id="mi_mapa" data-lat="${props.latitud}" data-lng="${props.longitud}"></div>` : ''}
+                        ${!props.latitud && !props.longitud ? `<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalDireccion">
+                            <i class="fas fa-map-marker-alt"></i> Ubicación del local
+                        </button>` : ''}
+                    @endif
+                `;
+
+                // Abrir el modal
+                var modal = new bootstrap.Modal(document.getElementById('modalInfoReserva'));
+                modal.show();
+
+                // Si hay latitud y longitud, inicializar el mapa
+                if (props.latitud && props.longitud) {
+                    document.getElementById('modalInfoReserva').addEventListener('shown.bs.modal', function () {
+                        var lat = document.getElementById('mi_mapa').getAttribute('data-lat');
+                        var lng = document.getElementById('mi_mapa').getAttribute('data-lng');
+
+                        var map = L.map('mi_mapa').setView([lat, lng], 15); // Zoom a 15
+                        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            maxZoom: 19,
+                            attribution: '© OpenStreetMap'
+                        }).addTo(map);
+
+                        L.marker([lat, lng]).addTo(map)
+                            .bindPopup('Ubicación registrada.')
+                            .openPopup();
+
+                        map.invalidateSize();
+                    });
+                }
+            }
         });
+
+        calendar.render();
+    });
     </script>
-    
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 @endsection
