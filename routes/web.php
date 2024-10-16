@@ -47,12 +47,14 @@ Route::get('/reporteCanchas', [GestionCancha::class, 'pdf'])->name('reportesCanc
 Route::get('/notificaciones', [NotificacionController::class, 'index'])->name('notificacionindex');
 Route::post('/enviar-notificacion', [NotificacionController::class, 'enviarNotificacion'])->name('notificacion.enviar');
 Route::get('/reporteUtilidadCanchas', [GestionCancha::class, 'canchasUtilidad'])->name('reporteUtilidadCanchas');
+Route::get('/reporteUsuarios', [ControllerCrud::class, 'reporteUsuarios'])->name('reporteUsuarios');
 Route::get('/canchasLocales', [ReservaController::class, 'mostrarcanchas'])->name('mostrarcanchas');
 Route::get('/reservas', [ReservaController::class, 'Reservas'])->name('Reservas');
 Route::put('/reservas/{id}', [ReservaController::class, 'update'])->name('reservas.update');
 Route::post('/busqueda', [CanchasController::class, 'buscar'])->name('buscar');
 Route::post('/asignarUsuarios', [CanchasController::class, 'asignacion'])->name('local.asignacion');
 Route::post('/reservar', [ReservaController::class, 'reserva'])->name('reserva');
+Route::put('/reservasCancel/{id}', [ReservaController::class, 'cancelar'])->name('reservaCancelar');
 Route::post('/contenido', [ContenidoController::class, 'subir'])->name('cancha.contenido');
 Route::post('/updateContenido-{id}', [ContenidoController::class, 'update'])->name('contenido.update');
 Route::get('/eliminarImagen-{id}', [ContenidoController::class, 'eliminarImagen'])->name('eliminar.imagen');

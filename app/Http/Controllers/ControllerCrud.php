@@ -7,6 +7,7 @@ use Illuminate\Support\facades\DB;
 use App\Mail\SendMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ControllerCrud extends Controller
 {
@@ -99,7 +100,37 @@ class ControllerCrud extends Controller
             return back()->with("incorrecto", "Error al actualizar el usuario");
         }
     }
-    
-    
-    
+    public function reporteUsuarios(Request $request)
+    {
+        // Validamos que se reciban las fechas de inicio y fin
+        $request->validate([
+            'fecha_inicio' => 'required|date',
+            'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+        ]);
+
+        // Obtenemos las fechas de inicio y fin del request
+        $fechaInicio = $request->input('fecha_inicio');
+        $fechaFin = $request->input('fecha_fin');
+        $idLocal = auth()->user()->local;
+        // Consulta SQL con filtrado por rango de fechas
+        $usuarios = DB::select("SELECT u.id, u.nombre AS nombre_usuario, u.email, COUNT(r.ID_Reserva) AS total_reservas
+            FROM users u
+            INNER JOIN reservas r ON u.id = r.id
+            INNER JOIN detalle_reserva DR ON r.ID_Reserva=DR.ID_Reserva
+            INNER JOIN canchas C ON C.ID_Cancha=DR.ID_Cancha
+            INNER JOIN locales l ON C.ID_Local = l.ID_Local
+            WHERE r.Estado_Reserva = 'Confirmada'
+            AND r.fecha_reserva BETWEEN ? AND ? -- Filtrado por rango de fechas
+            AND l.ID_Local = ?
+            GROUP BY u.id, u.nombre, u.email, l.nombre
+            ORDER BY total_reservas DESC
+        ", [$fechaInicio, $fechaFin, $idLocal]);
+
+
+        // Cargar la vista PDF con los usuarios filtrados
+        $pdf = Pdf::loadView('pages.reportes.reporteUsuarios', compact('usuarios', 'fechaInicio', 'fechaFin'));
+
+        // Retornar el PDF para ser visualizado
+        return $pdf->stream();
+    }
 }

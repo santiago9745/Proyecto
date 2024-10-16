@@ -100,7 +100,10 @@ class ReservaController extends Controller
 
     // Si el usuario tiene un local asignado
     if (!empty($idlocal)) {
-        $sql = DB::select("SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,u.nombre AS usuario_nombre, u.email AS usuario_email, u.primerApellido, u.segundoApellido
+        $sql = DB::select("SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,u.nombre AS usuario_nombre,
+                            u.email AS usuario_email, u.primerApellido, u.segundoApellido,
+                            TIMESTAMPDIFF(DAY, NOW(), CONCAT(r.Fecha_Reserva, ' ', r.Hora_Inicio)) AS dias_restantes,
+                            TIMESTAMPDIFF(HOUR, NOW(), CONCAT(r.Fecha_Reserva, ' ', r.Hora_Inicio)) % 24 AS horas_restantes
                             FROM locales l
                             JOIN canchas c ON l.ID_Local = c.ID_Local
                             JOIN detalle_reserva dr ON c.ID_Cancha = dr.ID_Cancha
@@ -110,7 +113,10 @@ class ReservaController extends Controller
 
     // Si el usuario NO tiene un local asignado
     } else {
-        $sql = DB::select("SELECT L.nombre,r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,L.latitud,L.longitud
+        $sql = DB::select("SELECT L.nombre,r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,
+                            L.latitud,L.longitud,
+                            TIMESTAMPDIFF(DAY, NOW(), CONCAT(r.Fecha_Reserva, ' ', r.Hora_Inicio)) AS dias_restantes,
+                            TIMESTAMPDIFF(HOUR, NOW(), CONCAT(r.Fecha_Reserva, ' ', r.Hora_Inicio)) % 24 AS horas_restantes
                             FROM reservas r
                             INNER JOIN detalle_reserva D ON D.ID_Reserva=r.ID_Reserva
                             INNER JOIN canchas C ON C.ID_Cancha=D.ID_Cancha
@@ -130,6 +136,16 @@ class ReservaController extends Controller
             ->update(['Estado_Reserva' => $request->Estado_Reserva]);
 
         return redirect()->back()->with('success', 'Estado de la reserva actualizado correctamente.');
-    }   
+    } 
+    public function cancelar($id)
+    {
+            $sql = DB::update("UPDATE reservas SET estado_reserva = ? WHERE ID_Reserva = ?", [
+                'Cancelada', // Cambia el estado a 'Cancelado'
+                $id // ID de la reserva pasada desde la solicitud
+            ]);
+
+            return redirect()->back()->with('success', 'Reserva cancelada exitosamente.');
+    }
+  
 
 }

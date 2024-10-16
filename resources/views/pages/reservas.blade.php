@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    @include('layouts.navbars.auth.topnav', ['title' => 'Reservas registradas'])
+@include('layouts.navbars.guest.navbar')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css" rel="stylesheet" />
 
@@ -22,10 +22,7 @@
     <div class="row mt-4 mx-4">
         <div class="col-12">
             <div class="card mb-4">
-                <div class="card-header pb-0">
-                    <h6>Reservas registradas</h6>
-                </div>
-                <div class="card-body px-0 pt-0 pb-2">
+                <div class="card-body px-0 pt-7 pb-2">
                     <div class="table-responsive p-0">
                         <div id="calendar"></div>
                     </div>
@@ -33,29 +30,24 @@
             </div>        
         </div>
     </div>
-    
-    <!-- Modal de información de la reserva -->
     <div class="modal fade" id="modalInfoReserva" tabindex="-1" aria-labelledby="modalInfoReservaLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-centered"> <!-- Agregar modal-dialog-centered -->
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalInfoReservaLabel">Detalles de la Reserva</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" id="infoReservaContent">
-                    @if (empty(auth()->user()->local))
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalDireccion">
-                            <i class="fas fa-map-marker-alt"></i> Ubicacion del local
-                        </button>  
-                    @endif 
+                <div class="modal-body" id="infoReservaContent" style="max-height: 650px; overflow-y: auto; overflow-x: hidden;">
                 </div>
                 <div class="modal-footer">
+                    <p class="text-sm font-weight-bold mb-0 ps-2">
+                    </p>                      
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
@@ -63,6 +55,7 @@
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'es',
+            dayHeaderFormat: { weekday: 'long' },
             events: [
                 @foreach($sql as $row)
                 {
@@ -75,6 +68,10 @@
                     end: '{{ $row->Fecha_Reserva }}T{{ $row->Hora_Fin }}',
                     color: '{{ $row->Estado_Reserva == "Confirmada" ? "green" : ($row->Estado_Reserva == "Pendiente" ? "orange" : "red") }}',
                     extendedProps: {
+                        @if (!empty(auth()->user()->local))
+                            diasRestantes: '{{ $row->dias_restantes }}', // Asegúrate de que los días restantes estén en la consulta SQL
+                            horasRestantes: '{{ $row->horas_restantes }}', // Asegúrate de que las horas restantes estén en la consulta SQL
+                        @endif
                         @if (empty(auth()->user()->local))
                             nombreLocal: '{{ $row->nombre }}',
                         @endif
@@ -97,6 +94,20 @@
             ],
             eventClick: function(info) {
                 var props = info.event.extendedProps;
+                var now = new Date();
+    
+                // Obtener la fecha y hora de inicio de la reserva
+                var fechaInicioReserva = new Date(info.event.start);
+
+                // Calcular la diferencia en milisegundos
+                var diferenciaMs = fechaInicioReserva - now;
+
+                // Convertir a días y horas
+                var diasRestantes = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24));
+                var horasRestantes = Math.floor((diferenciaMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+                // Determinar el color
+                var color = diferenciaMs >= 0 ? 'green' : 'grey';
 
                 // Mostrar los detalles de la reserva
                 document.getElementById('infoReservaContent').innerHTML = `
@@ -108,6 +119,15 @@
                     ${!props.nombreLocal ? `<p><strong>Nombre del Cliente:</strong> ${props.nombreCliente}</p>` : ''}
                     ${!props.nombreLocal ? `<p><strong>Email del Cliente:</strong> ${props.emailCliente}</p>` : ''}
                 `;
+                document.getElementById('infoReservaContent').innerHTML += `
+                    <p><strong>Tiempo restante:</strong>
+                        ${diferenciaMs >= 0
+                            ? `<span style="color: ${color};">Quedan ${diasRestantes} días y ${horasRestantes} horas</span>`
+                            : `<span style="color: grey;">La reserva ya ha pasado.</span>`
+                        }
+                    </p>
+                `;
+                
 
                 // Sección de formulario y WhatsApp
                 document.getElementById('infoReservaContent').innerHTML += `
@@ -133,6 +153,11 @@
                             <i class="fas fa-map-marker-alt"></i> Ubicación del local
                         </button>` : ''}
                     @endif
+                    <form action="/reservasCancel/${props.idReserva}" method="POST" onsubmit="return confirmarCancelacion()">
+                        @csrf
+                        @method('PUT') <!-- Cambia a PUT si es necesario -->
+                        <button type="submit" class="btn btn-danger">Cancelar Reserva</button>
+                    </form>
                 `;
 
                 // Abrir el modal
