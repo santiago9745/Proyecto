@@ -4,10 +4,14 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <style>
         #mi_mapa{
-            height: 690px;
-            width: 1300px ;
+            height: 600px;
+            width: 1200px ;
         }
     </style>
+    <div class="image-slider">
+        <img src="/assets/img/futbol-11.jpg" alt="Imagen deportiva 1">
+        <img src="/assets/img/young-people-playing-basketball.jpg" alt="Imagen deportiva 2">
+    </div>
     <div class="container position-sticky z-index-sticky top-0">
         <div class="row">
             <div class="col-12">
@@ -20,7 +24,10 @@
             <div class="min-vh-45 mt-8">
                 <div class="container">
                     <div class="row">
-                        <div id="mi_mapa" data-lat="" data-lng=""></div>
+                        <div class="border: 2px solid #007bff;">
+                            <div id="mi_mapa" data-lat="" data-lng=""></div>
+                        </div>
+                        
                     </div>
                 </div>
             </div>

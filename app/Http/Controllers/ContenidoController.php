@@ -16,7 +16,7 @@ class ContenidoController extends Controller
                            INNER JOIN users U ON L.ID_Local = U.local
                            WHERE L.estado=1 AND L.ID_Local=$idlocal
                            ORDER BY L.ID_Local, L.nombre, L.direccion, M.URL DESC LIMIT 1");
-        $imagenes = DB::select("SELECT M.ID_Multimedia, M.URL
+        $imagenes = DB::select("SELECT M.ID_Multimedia, M.URL, M.Tipo
         FROM multimedia M
         WHERE M.ID_Local = ?", 
         [$idlocal]);

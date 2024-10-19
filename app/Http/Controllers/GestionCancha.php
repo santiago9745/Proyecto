@@ -11,7 +11,7 @@ class GestionCancha extends Controller
     public function index(){
         $local = auth()->user()->local;
         if ($local != "") {
-            $sql=DB::select("SELECT C.ID_Cancha,C.nombre, C.estado_cancha,T.nombre_deporte
+            $sql=DB::select("SELECT C.ID_Cancha,C.nombre, C.estado_cancha,T.nombre_deporte,C.precio
                         FROM canchas C
                         INNER JOIN locales L ON L.ID_Local=C.ID_Local
                         INNER JOIN canchatipo Ct ON C.ID_Cancha=Ct.ID_Cancha

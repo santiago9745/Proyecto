@@ -24,6 +24,7 @@ use App\Http\Controllers\ContenidoController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\NotificacionController;
+use App\Http\Controllers\PromocionController;
             
 
 
@@ -44,8 +45,15 @@ Route::get('/mapa', [CanchasController::class, 'showMap'])->name('mapa.locales')
 Route::get('/dashboard', [HomeController::class, 'index'])->name('welcome')->middleware('auth');
 Route::get('/', [ReservaController::class, 'index'])->name('home.index');
 Route::get('/reporteCanchas', [GestionCancha::class, 'pdf'])->name('reportesCanchas');
+Route::post('/Cotizacion', [ReservaController::class, 'getReserva'])->name('Cotizacion');
+Route::get('/comprobante-{id}', [ReservaController::class, 'reservaComprobante'])->name('comprobante');
 Route::get('/notificaciones', [NotificacionController::class, 'index'])->name('notificacionindex');
+Route::get('/promociones', [PromocionController::class, 'index'])->name('promocionindex');
+Route::post('/Crearpromociones', [PromocionController::class, 'crear'])->name('crearPromocion');
+Route::post('/Editarpromociones', [PromocionController::class, 'editar'])->name('EditarPromocion');
+Route::get('/Eliminarpromocion-{id}', [PromocionController::class, 'delete'])->name('EliminarPromocion');
 Route::post('/enviar-notificacion', [NotificacionController::class, 'enviarNotificacion'])->name('notificacion.enviar');
+Route::post('/notificar-promocion-{id}', [PromocionController::class, 'notificarPromocion'])->name('notificarPromocion');
 Route::get('/reporteUtilidadCanchas', [GestionCancha::class, 'canchasUtilidad'])->name('reporteUtilidadCanchas');
 Route::get('/reporteUsuarios', [ControllerCrud::class, 'reporteUsuarios'])->name('reporteUsuarios');
 Route::get('/canchasLocales', [ReservaController::class, 'mostrarcanchas'])->name('mostrarcanchas');

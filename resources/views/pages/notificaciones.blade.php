@@ -2,7 +2,17 @@
 
 @section('content')
     @include('layouts.navbars.auth.topnav', ['title' => 'Recordatorios para reservas confirmadas'])
-
+    <style>
+        .btn-custom {
+            background-color: #FFD700; /* Color amarillo dorado */
+            color: white; /* Texto blanco para contraste */
+        }
+    
+        .btn-custom:hover {
+            background-color: #FFC107; /* Un tono más oscuro al pasar el mouse */
+        }
+    </style>
+    
     <div class="container mt-5">
         
         @if(empty($sql))
@@ -16,8 +26,6 @@
                         // Asignamos colores según la cantidad de días restantes
                         if ($reserva->dias_restantes < 3 && $reserva->dias_restantes >= 0) {
                             $color = 'red'; // Menos de 3 días
-                        } elseif ($reserva->dias_restantes <= 7 && $reserva->dias_restantes >= 3) {
-                            $color = 'yellow'; // Entre 3 y 7 días
                         } else {
                             $color = 'green'; // Más de 7 días
                         }
@@ -52,7 +60,7 @@
                                 </p>
 
                                 <!-- Botón que abre el modal -->
-                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalNotificacion-{{ $reserva->ID_Reserva }}">
+                                <button type="button" class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#ModalNotificacion-{{ $reserva->ID_Reserva }}">
                                     Notificar sobre la reserva
                                 </button>
                             </div>

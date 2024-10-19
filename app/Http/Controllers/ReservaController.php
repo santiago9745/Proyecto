@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReservaController extends Controller
 {
@@ -36,7 +37,7 @@ class ReservaController extends Controller
                                         WHERE M.ID_Local = ?",
                                         [$local->ID_Local]);
         // Obtener las canchas asociadas a este local
-        $local->canchas = DB::select("SELECT *
+        $local->canchas = DB::select("SELECT ID_Cancha, nombre, precio
                                       FROM canchas
                                       WHERE ID_Local = ? AND estado=1 AND estado_cancha LIKE 'DISPONIBLE'", [$local->ID_Local]);
         }
@@ -100,7 +101,7 @@ class ReservaController extends Controller
 
     // Si el usuario tiene un local asignado
     if (!empty($idlocal)) {
-        $sql = DB::select("SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,u.nombre AS usuario_nombre,
+        $sql = DB::select("SELECT u.id,r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,u.nombre AS usuario_nombre,
                             u.email AS usuario_email, u.primerApellido, u.segundoApellido,
                             TIMESTAMPDIFF(DAY, NOW(), CONCAT(r.Fecha_Reserva, ' ', r.Hora_Inicio)) AS dias_restantes,
                             TIMESTAMPDIFF(HOUR, NOW(), CONCAT(r.Fecha_Reserva, ' ', r.Hora_Inicio)) % 24 AS horas_restantes
@@ -116,7 +117,8 @@ class ReservaController extends Controller
         $sql = DB::select("SELECT L.nombre,r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,
                             L.latitud,L.longitud,
                             TIMESTAMPDIFF(DAY, NOW(), CONCAT(r.Fecha_Reserva, ' ', r.Hora_Inicio)) AS dias_restantes,
-                            TIMESTAMPDIFF(HOUR, NOW(), CONCAT(r.Fecha_Reserva, ' ', r.Hora_Inicio)) % 24 AS horas_restantes
+                            TIMESTAMPDIFF(HOUR, NOW(), CONCAT(r.Fecha_Reserva, ' ', r.Hora_Inicio)) % 24 AS horas_restantes,
+                            r.fecha_creacion
                             FROM reservas r
                             INNER JOIN detalle_reserva D ON D.ID_Reserva=r.ID_Reserva
                             INNER JOIN canchas C ON C.ID_Cancha=D.ID_Cancha
@@ -146,6 +148,63 @@ class ReservaController extends Controller
 
             return redirect()->back()->with('success', 'Reserva cancelada exitosamente.');
     }
-  
+    public function getReserva(Request $request)
+    {
+        $usuarioId = auth()->user()->id;
+
+    // Validar que la fecha de creación se envíe
+    $request->validate([
+        'fecha_creacion' => 'required|date',
+    ]);
+
+    $fechaCreacion = $request->fecha_creacion;
+
+    $reservas = DB::select("SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,
+                        L.nombre AS nombre_local, CONCAT(u.nombre,' ',u.primerApellido,' ',u.segundoApellido) AS nombre_cliente, 
+                        u.email AS email_cliente, r.fecha_creacion, c.precio,
+                        TIMESTAMPDIFF(MINUTE, r.Hora_Inicio, r.Hora_Fin) / 60 * c.precio AS total_por_reserva
+                    FROM reservas r
+                    INNER JOIN detalle_reserva dr ON r.ID_Reserva = dr.ID_Reserva
+                    INNER JOIN canchas c ON dr.ID_Cancha = c.ID_Cancha
+                    INNER JOIN locales L ON c.ID_Local = L.ID_Local
+                    INNER JOIN users u ON r.id = u.id
+                    WHERE u.id = ? -- Usa el ID del usuario autenticado
+                    AND r.estado_reserva = 'Confirmada'
+                    AND DATE(r.fecha_creacion) = DATE(?)
+                    ORDER BY r.fecha_creacion DESC;", [$usuarioId, $fechaCreacion]);
+
+
+    $pdf = Pdf::loadView('.pages.reportes.cotizacion', compact('reservas'));
+    return $pdf->stream();
+    }
+    public function reservaComprobante($id)
+    {
+        $usuarioId = auth()->user()->id;
+        $reservas = DB::select("
+        SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,
+            L.nombre AS nombre_local, 
+            CONCAT(u.nombre,' ',u.primerApellido,' ',u.segundoApellido) AS nombreCompleto, 
+            u.email AS email_cliente,
+            r.fecha_creacion, c.precio,
+            TIMESTAMPDIFF(MINUTE, r.Hora_Inicio, r.Hora_Fin) / 60 * c.precio AS total_por_reserva,
+            P.descuento, P.Fecha_Inicio, P.Fecha_Fin
+        FROM reservas r
+        INNER JOIN detalle_reserva dr ON r.ID_Reserva = dr.ID_Reserva
+        INNER JOIN canchas c ON dr.ID_Cancha = c.ID_Cancha
+        INNER JOIN locales L ON c.ID_Local = L.ID_Local
+        LEFT JOIN precios P ON P.ID_Local = L.ID_Local 
+            AND CURDATE() BETWEEN P.Fecha_Inicio AND P.Fecha_Fin -- Verificar si la fecha actual está dentro del rango de fechas del descuento
+        INNER JOIN users u ON r.id = u.id
+        WHERE r.id = ?
+        AND r.estado_reserva = 'Confirmada'
+        AND DATE(r.fecha_creacion) = (
+            SELECT DATE(MAX(fecha_creacion)) 
+            FROM reservas 
+            WHERE id = ?
+        )
+        ORDER BY r.fecha_creacion DESC;", [$id, $id]);
+        $pdf = Pdf::loadView('.pages.reportes.comprobante', compact('reservas'));
+        return $pdf->stream();
+    }
 
 }

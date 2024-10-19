@@ -59,6 +59,7 @@
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Disponibilidad</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tipo deporte</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Precio de la cancha en Bs.</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Editar/Eliminar</th>
                         </tr>
                     </thead>
@@ -74,6 +75,9 @@
                                     </td>
                                     <td class="align-middle text-center text-sm">
                                         <p class="text-sm font-weight-bold mb-0">{{$row->nombre_deporte}}</p>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <p class="text-sm font-weight-bold mb-0">{{$row->precio}}</p>
                                     </td>
                                     <td align="center">
                                         <div class="container">
