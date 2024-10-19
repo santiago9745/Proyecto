@@ -15,7 +15,7 @@
                         </div>
                     @endif
                     <div class="modal fade" id="ModalAgregar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
+                        <div class="modal-dialog modal-xl">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLabel">Agregar Canchas</h5>
@@ -32,6 +32,7 @@
                                                         <th>Nombre de la Cancha</th>
                                                         <th>Disponibilidad</th>
                                                         <th>Tipo de Deporte</th>
+                                                        <th>Precio de la Cancha (Bs.)</th> <!-- Nuevo campo de precio -->
                                                         <th>Acciones</th>
                                                     </tr>
                                                 </thead>
@@ -91,6 +92,7 @@
                                             </div>
                                         </div>
                                         <div class="card-body px-0 pt-0 pb-2">
+                                            <!-- Modal para editar cancha -->
                                             <div class="modal fade" id="ModalEditar{{$row->ID_Cancha}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
@@ -121,6 +123,10 @@
                                                                     <label class="form-label">Tipo deporte</label>
                                                                     <input type="text" class="form-control" name="tipo" value="{{$row->nombre_deporte}}">
                                                                 </div>
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">Precio de la cancha</label>
+                                                                    <input type="number" class="form-control" name="precio" value="{{$row->precio}}"> <!-- Campo de precio agregado -->
+                                                                </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                                                                     <button type="submit" class="btn btn-primary">Modificar registro</button>
@@ -130,6 +136,7 @@
                                                     </div>
                                                 </div>
                                             </div>
+
                                         </div>
                                     </td>
                                 </tr>
@@ -160,6 +167,7 @@
                     </select>
                 </td>
                 <td><input type="text" name="canchas[${counter}][tipo]" class="form-control" required></td>
+                <td><input type="number" name="canchas[${counter}][precio]" class="form-control" required></td>
                 <td><button type="button" class="btn btn-danger remove-row">Eliminar</button></td>
             `;
             tableBody.appendChild(newRow);

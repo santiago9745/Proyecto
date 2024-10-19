@@ -35,7 +35,8 @@ class GestionCancha extends Controller
                     'nombre' => strtoupper($cancha['nombre']),
                     'estado_cancha' => strtoupper($cancha['disponibilidad']),
                     'ID_Local' => $local,
-                    'idUsuario' => $idUsuario
+                    'idUsuario' => $idUsuario,
+                    'precio' => $cancha['precio']
                 ]);
 
                 // Insertar tipo de deporte
@@ -78,9 +79,10 @@ class GestionCancha extends Controller
     public function update(Request $request){
         $idUsuario = auth()->user()->id;
         try {
-            $sql=DB::insert("UPDATE canchas SET nombre=?,estado_cancha=?,fechaModificacion=CURRENT_TIMESTAMP,idUsuario=$idUsuario WHERE ID_Cancha=$request->id",[
+            $sql=DB::insert("UPDATE canchas SET nombre=?,estado_cancha=?,fechaModificacion=CURRENT_TIMESTAMP,idUsuario=$idUsuario, precio=? WHERE ID_Cancha=$request->id",[
                 strtoupper($request->nombre),
-                strtoupper($request->disponibilidad)
+                strtoupper($request->disponibilidad),
+                $request->precio
             ]);
             $sql=DB::insert("UPDATE tipo SET nombre_deporte=? WHERE ID_Tipo=$request->id");
         } catch (\Throwable $th) {

@@ -68,9 +68,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>ID Cancha</th>
                             <th>Nombre</th>
-                            <th>Estado Cancha</th>
                             <th>Deporte</th>
                             <th>Total de Reservas</th>
                         </tr>
@@ -78,11 +76,7 @@
                     <tbody>
                         @foreach($cancha as $c)
                         <tr>
-                            <td>{{ $c->ID_Cancha }}</td>
                             <td>{{ $c->nombre }}</td>
-                            <td class="{{ $c->estado_cancha == 'DISPONIBLE' ? 'state-active' : ($c->estado_cancha == 'PENDIENTE' ? 'state-pending' : 'state-closed') }}">
-                                {{ $c->estado_cancha }}
-                            </td>
                             <td>{{ $c->nombre_deporte }}</td>
                             <td>{{ $c->total_reservas }}</td>
                         </tr>

@@ -12,7 +12,7 @@
                     </div>
                     <div class="card-body text-center">
                         <p class="lead">Haz clic en el botón para generar el reporte de canchas con mayor demanda.</p>
-                        <a href="{{ route('reportesCanchas') }}" class="btn btn-lg btn-outline-success mt-3">
+                        <a href="{{ route('reportesCanchas') }}" class="btn btn-lg btn-outline-success mt-3" target="_blank">
                             <i class="fas fa-chart-bar me-2"></i> Generar Reporte
                         </a>
                     </div>
@@ -25,7 +25,7 @@
                     </div>
                     <div class="card-body text-center">
                         <p class="lead">Haz clic en el botón para generar el reporte de Utilización de Canchas</p>
-                        <form method="GET" action="{{ route('reporteUtilidadCanchas') }}">
+                        <form method="GET" action="{{ route('reporteUtilidadCanchas') }}" target="_blank">
                             <div class="form-group d-flex justify-content-center mt-3"> <!-- Added mt-3 here -->
                                 <div class="me-2">
                                     <label for="fecha_inicio">Fecha Inicio</label>
@@ -48,7 +48,7 @@
                     </div>
                     <div class="card-body text-center">
                         <p class="lead">Selecciona un rango de fechas para generar el reporte de usuarios con más reservas.</p>
-                        <form method="GET" action="{{ route('reporteUsuarios') }}">
+                        <form method="GET" action="{{ route('reporteUsuarios') }}" target="_blank">
                             <div class="form-group d-flex justify-content-center mt-3"> <!-- Added mt-3 here -->
                                 <div class="me-2">
                                     <label for="fecha_inicio">Fecha Inicio</label>

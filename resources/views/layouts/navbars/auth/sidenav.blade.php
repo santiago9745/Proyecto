@@ -1,3 +1,10 @@
+<style>
+    #sidenav-main {
+    z-index: 1000; /* Ajusta el valor según las necesidades de tu diseño */
+    position: fixed; /* Mantener la barra lateral fija */
+}
+
+</style>
 <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 "
     id="sidenav-main">
     <div class="sidenav-header">
