@@ -52,6 +52,7 @@ Route::get('/promociones', [PromocionController::class, 'index'])->name('promoci
 Route::post('/Crearpromociones', [PromocionController::class, 'crear'])->name('crearPromocion');
 Route::post('/Editarpromociones', [PromocionController::class, 'editar'])->name('EditarPromocion');
 Route::get('/Eliminarpromocion-{id}', [PromocionController::class, 'delete'])->name('EliminarPromocion');
+Route::get('/reportePromocion', [GestionCancha::class, 'descuentos'])->name('reportePromocion');
 Route::post('/enviar-notificacion', [NotificacionController::class, 'enviarNotificacion'])->name('notificacion.enviar');
 Route::post('/notificar-promocion-{id}', [PromocionController::class, 'notificarPromocion'])->name('notificarPromocion');
 Route::get('/reporteUtilidadCanchas', [GestionCancha::class, 'canchasUtilidad'])->name('reporteUtilidadCanchas');

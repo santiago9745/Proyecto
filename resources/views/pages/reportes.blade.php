@@ -66,6 +66,19 @@
                     </div>
                 </div>
             </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-lg h-100 mt-3">
+                            <div class="card-header bg-success text-white text-center py-4">
+                                <h4 class="mb-0">Generar Reporte de Canchas y Descuentos</h4>
+                            </div>
+                            <div class="card-body text-center">
+                                <p class="lead">Haz clic en el botón para generar el reporte de canchas con sus descuentos según el local.</p>
+                                <a href="{{ route('reportePromocion') }}" class="btn btn-lg btn-outline-primary mt-3" target="_blank">
+                                    <i class="fas fa-chart-bar me-2"></i> Generar Reporte
+                                </a>
+                            </div>
+                        </div>
+                    </div>
         </div>
     </div>
 @endsection

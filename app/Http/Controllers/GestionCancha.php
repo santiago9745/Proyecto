@@ -141,4 +141,16 @@ class GestionCancha extends Controller
         $pdf = Pdf::loadView('.pages.reportes.utilizacionCanchas', compact('utilizacionCanchas', 'fechaInicio', 'fechaFin'));
         return $pdf->stream();
     }
+    public function descuentos()
+    {
+        $local = auth()->user()->local;
+        $canchasConDescuento = DB::select("SELECT C.nombre AS nombre_cancha,C.estado_cancha,P.descuento,P.Fecha_Inicio,P.Fecha_Fin
+                                            FROM canchas C
+                                            INNER JOIN locales L ON C.ID_Local= L.ID_Local
+                                            LEFT JOIN precios P ON P.ID_Cancha=C.ID_Cancha
+                                            WHERE L.ID_Local=?
+                            ",[$local]);
+        $pdf = Pdf::loadView('.pages.reportes.promocion', compact('canchasConDescuento'));
+        return $pdf->stream();
+    }
 }

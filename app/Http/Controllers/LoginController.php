@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Log;
+use App\Events\RecordatorioReservaEvent;
+use Illuminate\Support\Facades\DB;
 
 class LoginController extends Controller
 {
@@ -36,6 +39,15 @@ class LoginController extends Controller
             }
             else{
                 if (auth()->user()->rol== 'cancha') {
+                    Log::info('Evento de recordatorio de reserva está a punto de dispararse.');
+                    $reservas = DB::select("SELECT R.Fecha_Reserva,R.Hora_Inicio,R.Hora_Fin,CONCAT(U.nombre,' ',U.primerApellido,' ',segundoApellido) AS nombre_completo,U.email,C.nombre AS nombre_cancha
+                            FROM reservas R
+                            INNER JOIN users U ON U.id=R.id
+                            INNER JOIN detalle_reserva D ON D.ID_Reserva=R.ID_Reserva
+                            INNER JOIN canchas C ON C.ID_Cancha=D.ID_Cancha
+                            WHERE DATEDIFF(Fecha_Reserva, CURDATE()) = 3;");    
+                    event(new RecordatorioReservaEvent($reservas));
+
                     if (auth()->user()->estado == 2) {
                         return redirect('change-password');
                     }

@@ -16,9 +16,11 @@ class CanchasController extends Controller
     public function create(Request $request){
         try {
             $idUsuario = auth()->user()->id;
-            $sql=DB::insert("INSERT INTO locales(nombre,direccion,idUsuario) VALUES(?,?,$idUsuario)",[
+            $sql=DB::insert("INSERT INTO locales(nombre,direccion,idUsuario,latitud,longitud) VALUES(?,?,$idUsuario,?,?)",[
                 strtoupper($request->nombre),
-                strtoupper($request->direccion)
+                strtoupper($request->direccion),
+                $request->latitud,
+                $request->longitud
             ]);
         } catch (\Throwable $th) {
             $sql=0;
