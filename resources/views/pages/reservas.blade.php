@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </form>
                     <form action="{{ route('Cotizacion') }}" method="POST">
                         @csrf
-                        <input type="text" name="fecha_creacion" value="${props.fechaCreacion}">
+                        <input type="text" name="fecha_creacion" value="${props.fechaReserva}">
                         <button type="submit" class="btn btn-outline-success mt-2">Generar Cotización</button>
                     </form>
 

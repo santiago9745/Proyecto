@@ -170,8 +170,8 @@ class ReservaController extends Controller
                     INNER JOIN users u ON r.id = u.id
                     WHERE u.id = ? -- Usa el ID del usuario autenticado
                     AND r.estado_reserva = 'Confirmada'
-                    AND DATE(r.fecha_creacion) = DATE(?)
-                    ORDER BY r.fecha_creacion DESC;", [$usuarioId, $fechaCreacion]);
+                    AND DATE(r.Fecha_Reserva) = DATE(?)
+                    ORDER BY r.Fecha_Reserva DESC;", [$usuarioId, $fechaCreacion]);
 
 
     $pdf = Pdf::loadView('.pages.reportes.cotizacion', compact('reservas'));
@@ -197,12 +197,12 @@ class ReservaController extends Controller
         INNER JOIN users u ON r.id = u.id
         WHERE r.id = ?
         AND r.estado_reserva = 'Confirmada'
-        AND DATE(r.fecha_creacion) = (
-            SELECT DATE(MAX(fecha_creacion)) 
+        AND DATE(r.Fecha_Reserva) = (
+            SELECT DATE(MAX(Fecha_Reserva)) 
             FROM reservas 
             WHERE id = ?
         )
-        ORDER BY r.fecha_creacion DESC;", [$id, $id]);
+        ORDER BY r.Fecha_Reserva DESC;", [$id, $id]);
         $pdf = Pdf::loadView('.pages.reportes.comprobante', compact('reservas'));
         return $pdf->stream();
     }

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    @include('layouts.navbars.auth.topnav', ['title' => 'Previzualización del contenido'])
+    @include('layouts.navbars.auth.topnav', ['title' => 'Previzualización del contenido del local'])
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <style>
         #mi_mapa {
@@ -76,7 +76,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @foreach ($imagenes as $imagen)
+                                                    @foreach ($imagenes_local as $imagen)
                                                         <tr>
                                                             <td>{{ $imagen->Tipo }}</td>
                                                             <td>
@@ -116,7 +116,7 @@
                         <!-- Carrusel de Bootstrap -->
                         <div id="carouselLocal{{ $row->ID_Local }}" class="carousel slide" data-bs-ride="carousel">
                             <div class="carousel-inner" style="min-height: 300px;">
-                                @foreach ($imagenes as $index => $imagen)
+                                @foreach ($imagenes_local as $index => $imagen)
                                     <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
                                         <img src="{{ $imagen->URL }}" class="d-block w-100 img-fluid" alt="Imagen del local" style="object-fit: contain; max-height: 300px;">
                                     </div>

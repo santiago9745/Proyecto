@@ -63,7 +63,15 @@
                         <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="ni ni-bullet-list-67 text-dark text-sm opacity-10"></i>
                         </div>
-                        <span class="nav-link-text ms-1">Revisar de contenido</span>
+                        <span class="nav-link-text ms-1">Contenido del local</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ str_contains(request()->url(), 'contenidoCanchas') == true ? 'active' : '' }}" href="{{ route('page', ['page' => 'contenidoCanchas']) }}">
+                        <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="ni ni-bullet-list-67 text-dark text-sm opacity-10"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Contenido de las canchas</span>
                     </a>
                 </li>
                 <li class="nav-item">
