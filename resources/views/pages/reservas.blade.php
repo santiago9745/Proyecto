@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         @endif`,
                 start: '{{ $row->Fecha_Reserva }}T{{ $row->Hora_Inicio }}',
                 end: '{{ $row->Fecha_Reserva }}T{{ $row->Hora_Fin }}',
-                color: '{{ $row->Estado_Reserva == "Confirmada" ? "green" : ($row->Estado_Reserva == "Pendiente" ? "orange" : "red") }}',
+                color: '{{ $row->Estado_Reserva == "1" ? "green" : ($row->Estado_Reserva == "2" ? "orange" : "red") }}',
                 extendedProps: {
                     @if (!empty(auth()->user()->local))
                         diasRestantes: '{{ $row->dias_restantes }}', // Asegúrate de que los días restantes estén en la consulta SQL
@@ -168,19 +168,36 @@ document.addEventListener('DOMContentLoaded', function() {
                     @csrf
                     @method('PUT')
                     <select name="Estado_Reserva" class="form-control" onchange="this.form.submit()">
-                        <option value="Pendiente" ${props.estadoReserva === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
-                        <option value="Confirmada" ${props.estadoReserva === 'Confirmada' ? 'selected' : ''}>Confirmada</option>
-                        <option value="Cancelada" ${props.estadoReserva === 'Cancelada' ? 'selected' : ''}>Cancelada</option>
+                        <option value="2" ${props.estadoReserva === '2' ? 'selected' : ''}>Pendiente</option>
+                        <option value="1" ${props.estadoReserva === '1' ? 'selected' : ''}>Confirmada</option>
+                        <option value="0" ${props.estadoReserva === '0' ? 'selected' : ''}>Cancelada</option>
                     </select>
                 </form>
+                <div class="d-flex align-items-center">
                 <a href="https://wa.me/591${props.telefonoCliente}?text=Hola%20${encodeURIComponent(props.nombreCliente)},%20gracias%20por%20reservar%20con%20nosotros.%20Tu%20reserva%20es%20para%20el%20${props.fechaReserva}%20a%20las%20${props.horaInicio}" 
                     target="_blank" 
-                    class="btn btn-success mt-2">
+                    class="btn btn-success mt-2 me-3 btn-sm">
                     Comunícate por WhatsApp
                 </a>
                 
-                <a href="/comprobante-${props.idUsuario}" class="btn btn-lg btn-outline-success mt-3">
-                <i class="fas fa-chart-bar me-2"></i> Comprobante
+                <form action="/comprobante" method="POST" class="d-inline me-3" target="_blank">
+                    @csrf
+                    <input type="hidden" name="id" value="${props.idUsuario}">
+                    <input type="hidden" name="fechReserva" value="${props.fechaReserva}">
+                    <button type="submit" class="btn btn-outline-success mt-3 btn-sm">
+                        <i class="fas fa-chart-bar me-2"></i> Comprobante
+                    </button>
+                </form>
+                <form action="/enviarComprobante" method="POST" class="d-inline">
+                    @csrf
+                    <input type="hidden" name="id" value="${props.idUsuario}">
+                    <input type="hidden" name="fechaRserva" value="${props.fechaReserva}">
+                    <input type="hidden" name="email" value="${props.emailCliente}">
+                    <button type"submit" class="btn btn-outline-success mt-3 btn-sm">
+                        <i class="fas fa-envelope me-2"></i>Enviar comprobante
+                    </button>
+                </form>
+                </div>
             </a>
             @else
                 ${props.latitud && props.longitud ? `<div id="mi_mapa" data-lat="${props.latitud}" data-lng="${props.longitud}"></div>` : ''}

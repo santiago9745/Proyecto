@@ -47,7 +47,8 @@ Route::get('/dashboard', [HomeController::class, 'index'])->name('welcome')->mid
 Route::get('/', [ReservaController::class, 'index'])->name('home.index');
 Route::get('/reporteCanchas', [GestionCancha::class, 'pdf'])->name('reportesCanchas');
 Route::post('/Cotizacion', [ReservaController::class, 'getReserva'])->name('Cotizacion');
-Route::get('/comprobante-{id}', [ReservaController::class, 'reservaComprobante'])->name('comprobante');
+Route::post('/comprobante', [ReservaController::class, 'reservaComprobante'])->name('comprobante');
+Route::post('/enviarComprobante', [ReservaController::class, 'enviarComprobante'])->name('enviarComprobante');
 Route::get('/notificaciones', [NotificacionController::class, 'index'])->name('notificacionindex');
 Route::get('/promociones', [PromocionController::class, 'index'])->name('promocionindex');
 Route::post('/Crearpromociones', [PromocionController::class, 'crear'])->name('crearPromocion');

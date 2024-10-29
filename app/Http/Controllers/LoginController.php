@@ -39,13 +39,23 @@ class LoginController extends Controller
             }
             else{
                 if (auth()->user()->rol== 'cancha') {
+                    $idlocal=auth()->user()->local;
                     Log::info('Evento de recordatorio de reserva está a punto de dispararse.');
-                    $reservas = DB::select("SELECT R.Fecha_Reserva,R.Hora_Inicio,R.Hora_Fin,CONCAT(U.nombre,' ',U.primerApellido,' ',segundoApellido) AS nombre_completo,U.email,C.nombre AS nombre_cancha
-                            FROM reservas R
-                            INNER JOIN users U ON U.id=R.id
-                            INNER JOIN detalle_reserva D ON D.ID_Reserva=R.ID_Reserva
-                            INNER JOIN canchas C ON C.ID_Cancha=D.ID_Cancha
-                            WHERE DATEDIFF(Fecha_Reserva, CURDATE()) = 3;");    
+                    $reservas = DB::select("SELECT R.ID_Reserva, R.Fecha_Reserva, R.Hora_Inicio, R.Hora_Fin, 
+                                            CONCAT(U.nombre,' ',U.primerApellido,' ',U.segundoApellido) AS nombre_completo, 
+                                            U.email, C.nombre AS nombre_cancha
+                                            FROM reservas R
+                                            INNER JOIN users U ON U.id = R.id
+                                            INNER JOIN detalle_reserva D ON D.ID_Reserva = R.ID_Reserva
+                                            INNER JOIN canchas C ON C.ID_Cancha = D.ID_Cancha
+                                            WHERE DATEDIFF(Fecha_Reserva, CURDATE()) = 3
+                                            AND R.Estado_Reserva = 1
+                                            AND C.ID_Local = ?;",[$idlocal]);  
+                    foreach ($reservas as $reserva) {
+                        DB::table('reservas')
+                            ->where('ID_Reserva', $reserva->ID_Reserva)
+                            ->update(['Estado_Reserva' => 3]);
+                    }  
                     event(new RecordatorioReservaEvent($reservas));
 
                     if (auth()->user()->estado == 2) {

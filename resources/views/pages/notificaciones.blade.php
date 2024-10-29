@@ -61,12 +61,23 @@
 
                                 <!-- Botón que abre el modal -->
                                 <button type="button" class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#ModalNotificacion-{{ $reserva->ID_Reserva }}">
-                                    Notificar sobre la reserva
+                                    Enviar una notificacion personalizada
                                 </button>
                             </div>
                             <div class="card-footer text-center" style="background-color: #f8f9fa; border-radius: 0 0 15px 15px;">
-                                <span class="badge badge-warning" style="color: black">{{ $reserva->Estado_Reserva }}</span>
+                                @php
+                                    $estadoReserva = '';
+                                    if ($reserva->Estado_Reserva == 1) {
+                                        $estadoReserva = 'Confirmada';
+                                    } elseif ($reserva->Estado_Reserva == 2) {
+                                        $estadoReserva = 'Pendiente';
+                                    } elseif ($reserva->Estado_Reserva == 0) {
+                                        $estadoReserva = 'Cancelada'; // Si deseas manejar el estado 0
+                                    }
+                                @endphp
+                                <span class="badge badge-warning" style="color: black">{{ $estadoReserva }}</span>
                             </div>
+                            
                         </div>
                     </div>
 
@@ -81,30 +92,23 @@
                                 <div class="modal-body">
                                     <form action="{{ route('notificacion.enviar') }}" method="POST">
                                         @csrf
-                                        <div class="mb-3">
-                                            <input type="hidden" name="email" value="{{$reserva->email}}">
-                                            <input type="hidden" name="id" value="{{$reserva->ID_Reserva}}">
-                                            <label class="form-label">Selecciona el tipo de mensaje</label>
-                                            <div>
-                                                <input type="radio" name="tipo_mensaje_{{ $reserva->ID_Reserva }}" id="mensaje_autogenerado_{{ $reserva->ID_Reserva }}" value="autogenerado" onclick="toggleMensaje('{{ $reserva->ID_Reserva }}', false)" checked>
-                                                <label for="mensaje_autogenerado_{{ $reserva->ID_Reserva }}">Mensaje Autogenerado</label>
-                                            </div>
-                                            <div>
-                                                <input type="radio" name="tipo_mensaje_{{ $reserva->ID_Reserva }}" id="mensaje_personalizado_{{ $reserva->ID_Reserva }}" value="personalizado" onclick="toggleMensaje('{{ $reserva->ID_Reserva }}', true)">
-                                                <label for="mensaje_personalizado_{{ $reserva->ID_Reserva }}">Mensaje Personalizado</label>
-                                            </div>
-                                        </div>
+                                        <input type="hidden" name="email" value="{{$reserva->email}}">
+                                        <input type="hidden" name="id" value="{{$reserva->ID_Reserva}}">
 
-                                        <!-- Campo de mensaje autogenerado -->
-                                        <div id="mensaje_autogenerado_input_{{ $reserva->ID_Reserva }}" style="display: block;">
-                                            <textarea class="form-control" name="mensaje_autogenerado" rows="3" readonly>
-                                                Estimado/a {{ $reserva->nombreCompleto }}, su reserva en {{ $reserva->nombre_cancha }} el día {{ \Carbon\Carbon::parse($reserva->Fecha_Reserva)->format('d-m-Y') }} está próxima. ¡Le esperamos!
-                                            </textarea>
+                                        <div class="mb-3">
+                                            <label for="asunto" class="form-label">Asunto del mensaje</label>
+                                            <input type="text" class="form-control" name="asunto" id="asunto" required>
                                         </div>
                                         
+                                        <div class="mb-3">
+                                            <label class="form-label">Título del mensaje</label>
+                                            <input type="text" class="form-control" name="titulo" required>
+                                        </div>
+
                                         <!-- Campo para mensaje personalizado -->
-                                        <div id="mensaje_personalizado_input_{{ $reserva->ID_Reserva }}" style="display: none;">
-                                            <textarea class="form-control" name="mensaje_personalizado" rows="3"></textarea>
+                                        <div class="mb-3">
+                                            <label class="form-label">Mensaje personalizado</label>
+                                            <textarea class="form-control" name="mensaje" rows="3" required></textarea>
                                         </div>
 
                                         <div class="modal-footer">
@@ -121,19 +125,3 @@
         @endif
     </div>
 @endsection
-
-<script>
-    // Función para mostrar/ocultar el campo de mensaje personalizado o autogenerado
-    function toggleMensaje(id, showPersonalizado) {
-        const mensajeAutogeneradoInput = document.getElementById('mensaje_autogenerado_input_' + id);
-        const mensajePersonalizadoInput = document.getElementById('mensaje_personalizado_input_' + id);
-
-        if (showPersonalizado) {
-            mensajeAutogeneradoInput.style.display = 'none';
-            mensajePersonalizadoInput.style.display = 'block';
-        } else {
-            mensajeAutogeneradoInput.style.display = 'block';
-            mensajePersonalizadoInput.style.display = 'none';
-        }
-    }
-</script>

@@ -119,7 +119,7 @@ class ControllerCrud extends Controller
             INNER JOIN detalle_reserva DR ON r.ID_Reserva=DR.ID_Reserva
             INNER JOIN canchas C ON C.ID_Cancha=DR.ID_Cancha
             INNER JOIN locales l ON C.ID_Local = l.ID_Local
-            WHERE r.Estado_Reserva = 'Confirmada'
+            WHERE r.Estado_Reserva = 1
             AND r.fecha_reserva BETWEEN ? AND ? -- Filtrado por rango de fechas
             AND l.ID_Local = ?
             GROUP BY u.id, u.nombre, u.email, l.nombre

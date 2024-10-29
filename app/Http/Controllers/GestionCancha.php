@@ -106,7 +106,7 @@ class GestionCancha extends Controller
                             INNER JOIN tipo T ON T.ID_Tipo = Ct.ID_Tipo
                             INNER JOIN detalle_reserva DR ON C.ID_Cancha = DR.ID_Cancha
                             INNER JOIN reservas R ON R.ID_Reserva = DR.ID_Reserva
-                            WHERE C.estado = 1 AND L.ID_Local = $local AND R.estado_reserva = 'Confirmada'  -- Filtra solo reservas confirmadas
+                            WHERE C.estado = 1 AND L.ID_Local = $local AND R.estado_reserva = 1 -- Filtra solo reservas confirmadas
                             GROUP BY C.ID_Cancha, C.nombre, C.estado_cancha, T.nombre_deporte
                             ORDER BY total_reservas DESC;");
         $pdf = Pdf::loadView('.pages.reportes.reporteCanchas', compact('cancha'));
@@ -134,7 +134,7 @@ class GestionCancha extends Controller
                                         WHERE 
                                             R.Fecha_Reserva BETWEEN ? AND ?
                                             AND C.ID_Local = $local
-                                            AND R.Estado_Reserva = 'Confirmada'
+                                            AND R.Estado_Reserva = 1
                                         GROUP BY C.ID_Cancha
                                         ORDER BY numero_reservas DESC;"
                                         , [$fechaInicio, $fechaFin, $fechaInicio, $fechaFin]);
