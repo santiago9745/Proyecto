@@ -204,35 +204,52 @@ class ReservaController extends Controller
         return $pdf->stream();
     }
     public function enviarComprobante(Request $request)
-{
-    $id = $request->id;
-    $fecha = $request->fechaRserva; // Cambié el nombre de la variable a fechaRserva
-    $email = $request->email; // Asegúrate de que el nombre sea 'email'
-    
-    $reservas = DB::select("SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,
-                L.nombre AS nombre_local, 
-                CONCAT(u.nombre,' ',u.primerApellido,' ',u.segundoApellido) AS nombreCompleto, 
-                u.email AS email_cliente,
-                r.fecha_creacion, c.precio,
-                TIMESTAMPDIFF(MINUTE, r.Hora_Inicio, r.Hora_Fin) / 60 * c.precio AS total_por_reserva,
-                P.descuento, P.Fecha_Inicio, P.Fecha_Fin
-            FROM reservas r
-            INNER JOIN detalle_reserva dr ON r.ID_Reserva = dr.ID_Reserva
-            INNER JOIN canchas c ON dr.ID_Cancha = c.ID_Cancha
-            INNER JOIN locales L ON c.ID_Local = L.ID_Local
-            LEFT JOIN precios P ON P.ID_Local = L.ID_Local 
-                AND CURDATE() BETWEEN P.Fecha_Inicio AND P.Fecha_Fin 
-            INNER JOIN users u ON r.id = u.id
-            WHERE r.id = ?
-            AND r.estado_reserva = 1
-            AND DATE(r.Fecha_Reserva) = ?;", [$id, $fecha]);
+    {
+        $id = $request->id;
+        $fecha = $request->fechaRserva; // Cambié el nombre de la variable a fechaRserva
+        $email = $request->email; // Asegúrate de que el nombre sea 'email'
+        
+        $reservas = DB::select("SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,
+                    L.nombre AS nombre_local, 
+                    CONCAT(u.nombre,' ',u.primerApellido,' ',u.segundoApellido) AS nombreCompleto, 
+                    u.email AS email_cliente,
+                    r.fecha_creacion, c.precio,
+                    TIMESTAMPDIFF(MINUTE, r.Hora_Inicio, r.Hora_Fin) / 60 * c.precio AS total_por_reserva,
+                    P.descuento, P.Fecha_Inicio, P.Fecha_Fin
+                FROM reservas r
+                INNER JOIN detalle_reserva dr ON r.ID_Reserva = dr.ID_Reserva
+                INNER JOIN canchas c ON dr.ID_Cancha = c.ID_Cancha
+                INNER JOIN locales L ON c.ID_Local = L.ID_Local
+                LEFT JOIN precios P ON P.ID_Local = L.ID_Local 
+                    AND CURDATE() BETWEEN P.Fecha_Inicio AND P.Fecha_Fin 
+                INNER JOIN users u ON r.id = u.id
+                WHERE r.id = ?
+                AND r.estado_reserva = 1
+                AND DATE(r.Fecha_Reserva) = ?;", [$id, $fecha]);
 
-    $pdf = Pdf::loadView('.pages.reportes.comprobante', compact('reservas'));
-    $pdfContent = $pdf->output();
+        $pdf = Pdf::loadView('.pages.reportes.comprobante', compact('reservas'));
+        $pdfContent = $pdf->output();
 
-    Mail::to($email)->send(new ReservaComprobanteMail($reservas, $pdfContent));
+        Mail::to($email)->send(new ReservaComprobanteMail($reservas, $pdfContent));
 
-    return back()->with('success', 'Comprobante enviado exitosamente.');
-}
+        return back()->with('success', 'Comprobante enviado exitosamente.');
+    }
+    public function estadoPagado(Request $request){
+        try {
+            $sql=DB::insert("UPDATE reservas SET Estado_Reserva=4 WHERE ID_Reserva=?",[
+                $request->id
+            ]);
+        } catch (\Throwable $th) {
+            $sql=0;
+        }
+        if($sql==true)
+        {
+            return back()->with("correcto","usuarios eliminado correctamente");
+        }
+        else
+        {
+            return back()->with("incorrecto","Error al eliminar un usuario");
+        }
+    }
 
 }

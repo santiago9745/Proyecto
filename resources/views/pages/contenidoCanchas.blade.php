@@ -59,6 +59,19 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
+                                                    <label for="example-text-input" class="form-control-label">Informacio tipo de deporte:</label>
+                                                    <input class="form-control" type="text" name="tipo" value="{{ $row->nombre_deporte }}">
+                                                    <input type="hidden" name="idtipo" value="{{$row->ID_Tipo}}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="example-text-input" class="form-control-label">Precio de la cancha:</label>
+                                                    <input class="form-control" type="number" name="precio" value="{{ $row->precio }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
                                                     <label for="imagen" class="form-control-label">Imágenes</label>
                                                     <input class="form-control" type="file" id="imagen" name="imagenes[]" accept="image/jpeg, image/png" multiple>
                                                 </div>
@@ -148,6 +161,8 @@
                                     <div class="text-center mt-4">
                                         <h5>{{ $row->nombreCancha }}</h5>
                                         <p><strong>Estado:</strong> {{ $row->estado_cancha }}</p>
+                                        <p><strong>Tipo de deporte:</strong> {{ $row->nombre_deporte }}</p>
+                                        <p><strong>Precio:</strong> {{ $cancha->precio }}</p>
                                         <hr class="my-4">
                                     </div>
                                 </div>

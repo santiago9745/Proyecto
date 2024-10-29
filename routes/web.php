@@ -65,11 +65,13 @@ Route::put('/reservas/{id}', [ReservaController::class, 'update'])->name('reserv
 Route::post('/busqueda', [CanchasController::class, 'buscar'])->name('buscar');
 Route::post('/asignarUsuarios', [CanchasController::class, 'asignacion'])->name('local.asignacion');
 Route::post('/reservar', [ReservaController::class, 'reserva'])->name('reserva');
+Route::post('/estadoPagado', [ReservaController::class, 'estadoPagado'])->name('estadoPagado');
 Route::put('/reservasCancel/{id}', [ReservaController::class, 'cancelar'])->name('reservaCancelar');
 Route::post('/contenido', [ContenidoController::class, 'subir'])->name('cancha.contenido');
 Route::post('/updateContenido-{id}', [ContenidoController::class, 'update'])->name('contenido.update');
 Route::post('/updateContenidoCancha', [ContenidoController::class, 'updateCanchas'])->name('contenido.updateCanchas');
 Route::get('/eliminarImagen-{id}', [ContenidoController::class, 'eliminarImagen'])->name('eliminar.imagen');
+Route::get('/listadoCanchas-{id}', [GestionCancha::class, 'getCanchaByLocalId'])->name('getCanchaByLocalId');
 Route::post('/agregarLocal', [CanchasController::class, 'create'])->name('local.create');
 Route::post('/agregarCancha', [GestionCancha::class, 'agregar'])->name('cancha.create');
 Route::post('/updateLocal', [CanchasController::class, 'update'])->name('local.update');

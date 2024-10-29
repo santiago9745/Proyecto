@@ -34,8 +34,10 @@ class ContenidoController extends Controller
     }
     public function indexCanchas(){
         $idlocal = auth()->user()->local;
-        $canchas = DB::select("SELECT C.ID_Cancha, C.nombre AS nombreCancha, C.estado_cancha
+        $canchas = DB::select("SELECT C.ID_Cancha, C.nombre AS nombreCancha, C.estado_cancha,T.nombre_deporte,T.ID_Tipo,C.precio
                                 FROM canchas C
+                                INNER JOIN canchatipo CT ON C.ID_Cancha=CT.ID_Cancha
+                                INNER JOIN tipo T ON T.ID_Tipo = CT.ID_Tipo
                                 WHERE C.ID_Local = ? AND estado=1
                                 ORDER BY C.ID_Cancha", 
                                 [$idlocal]);
@@ -122,10 +124,15 @@ class ContenidoController extends Controller
             $idCancha = $request->id;
     
             // Actualizar la información de la cancha en la base de datos
-            $sql = DB::update("UPDATE canchas SET nombre=?, estado_cancha=?, fechaModificacion=CURRENT_TIMESTAMP WHERE ID_Cancha=?", [
+            $sql = DB::update("UPDATE canchas SET nombre=?, estado_cancha=?, precio=?, fechaModificacion=CURRENT_TIMESTAMP WHERE ID_Cancha=?", [
                 strtoupper($request->nombre), // Nombre de la cancha
                 strtoupper($request->estado), // Estado de la cancha
+                $request->precio,
                 $idCancha
+            ]);
+            DB::update("UPDATE tipo SET nombre_deporte=? WHERE ID_Tipo=?",[
+                strtoupper($request->tipo),
+                $request->idtipo
             ]);
     
             // Manejar la subida de imágenes

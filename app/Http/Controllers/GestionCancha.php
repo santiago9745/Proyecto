@@ -76,6 +76,24 @@ class GestionCancha extends Controller
             return back()->with("incorrecto","Error al eliminar un usuario");
         }
     }
+    public function getCanchaByLocalId($localId){
+        if ($localId != "") {
+            $canchas=DB::select("SELECT C.ID_Cancha,C.nombre, C.estado_cancha,T.nombre_deporte,C.precio
+                        FROM canchas C
+                        INNER JOIN locales L ON L.ID_Local=C.ID_Local
+                        INNER JOIN canchatipo Ct ON C.ID_Cancha=Ct.ID_Cancha
+                        INNER JOIN tipo T ON T.ID_Tipo=Ct.ID_Tipo
+                        WHERE C.estado=1 AND C.ID_Local=$localId");
+                        foreach ($canchas as $cancha) {
+                            $cancha->imagenes = DB::select("SELECT M.URL
+                                                            FROM multimedia M
+                                                            WHERE M.ID_Cancha = ?", [$cancha->ID_Cancha]);
+                        }
+        } else {
+            $canchas=0;
+        }
+        return view(".pages.canchas-by-locales")->with('canchas', $canchas);
+    }
     public function update(Request $request){
         $idUsuario = auth()->user()->id;
         try {
@@ -153,4 +171,5 @@ class GestionCancha extends Controller
         $pdf = Pdf::loadView('.pages.reportes.promocion', compact('canchasConDescuento'));
         return $pdf->stream();
     }
+    
 }

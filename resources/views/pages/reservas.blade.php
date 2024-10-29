@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         @endif`,
                 start: '{{ $row->Fecha_Reserva }}T{{ $row->Hora_Inicio }}',
                 end: '{{ $row->Fecha_Reserva }}T{{ $row->Hora_Fin }}',
-                color: '{{ $row->Estado_Reserva == "1" ? "green" : ($row->Estado_Reserva == "2" ? "orange" : "red") }}',
+                color: '{{ $row->Estado_Reserva == "1" ? "green" : ($row->Estado_Reserva == "2" ? "orange" : ($row->Estado_Reserva == "4" ? "blue" : "red")) }}',
                 extendedProps: {
                     @if (!empty(auth()->user()->local))
                         diasRestantes: '{{ $row->dias_restantes }}', // Asegúrate de que los días restantes estén en la consulta SQL
@@ -195,6 +195,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     <input type="hidden" name="email" value="${props.emailCliente}">
                     <button type"submit" class="btn btn-outline-success mt-3 btn-sm">
                         <i class="fas fa-envelope me-2"></i>Enviar comprobante
+                    </button>
+                </form>
+                <form action="/estadoPagado" method="POST" class="d-inline ms-3">
+                    @csrf
+                    <input type="hidden" name="id" value="${props.idReserva}">
+                    <button type"submit" class="btn btn-outline-success mt-3 btn-sm">
+                        <i class="fas fa-envelope me-2"></i>Pagado
                     </button>
                 </form>
                 </div>

@@ -72,10 +72,10 @@
                                                         <span class="text-muted">{{ $local->latitud }}, {{ $local->longitud }}</span>
                                                     </div>
                                                     <div class="mt-4">
-                                                        <a href="#" class="btn btn-sm btn-info">Ver detalles</a>
-                                                        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#ModalAgregar{{ $local->ID_Local }}">
+                                                        <a href="{{route('getCanchaByLocalId', $local->ID_Local)}}" class="btn btn-sm btn-info">Reservar Canchas</a>
+                                                        {{-- <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#ModalAgregar{{ $local->ID_Local }}">
                                                             Reservar Canchas
-                                                        </button>
+                                                        </button> --}}
                                                         <a href="https://maps.google.com/?q={{ $local->latitud }},{{ $local->longitud }}" target="_blank" class="btn btn-sm btn-success">Ver en el mapa</a>
                                                     </div>
                                                 </div>
