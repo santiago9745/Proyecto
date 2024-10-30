@@ -251,5 +251,46 @@ class ReservaController extends Controller
             return back()->with("incorrecto","Error al eliminar un usuario");
         }
     }
+    public function reporteIngresos(Request $request){
+       $reservas = DB::select("SELECT
+    (c.precio * (1 - COALESCE(p.descuento, 0) / 100)) AS Precio_Final, 
+    r.ID_Reserva,
+    r.Fecha_Reserva,
+    r.Hora_Inicio,
+    r.Hora_Fin,
+    c.nombre AS Nombre_Cancha,
+    l.direccion AS Direccion_Local,
+    l.nombre AS Nombre_Local,
+    c.precio AS Precio_Base,
+    COALESCE(p.descuento, 0) AS Descuento,
+    CONCAT(u.nombre, ' ', u.primerApellido, ' ', u.segundoApellido) AS Nombre_Usuario
+FROM 
+    reservas r
+JOIN 
+    detalle_reserva dr ON r.ID_Reserva = dr.ID_Reserva
+JOIN 
+    canchas c ON dr.ID_Cancha = c.ID_Cancha
+JOIN 
+    locales l ON c.ID_Local = l.ID_Local
+LEFT JOIN 
+    precios p ON p.ID_Local = l.ID_Local
+    AND r.Fecha_Reserva BETWEEN p.fecha_inicio AND p.fecha_fin
+JOIN 
+    users u ON r.id = u.id
+WHERE 
+    r.Fecha_Reserva BETWEEN ? AND ?
+    AND r.Estado_Reserva = 4;
+",[
+                            $request->fecha_inicio,
+                            $request->fecha_fin
+                        ]); 
+
+        // Generar el PDF
+        $pdf = PDF::loadView('.pages.reportes.ingresos', compact('reservas'));
+    
+        return $pdf->stream();
+    }
+    
+
 
 }

@@ -94,6 +94,34 @@ class GestionCancha extends Controller
         }
         return view(".pages.canchas-by-locales")->with('canchas', $canchas);
     }
+    public function getHorariosOcupados(Request $request)
+{
+    // Obtener los horarios reservados
+    $horariosReservados = DB::select("SELECT R.Hora_Inicio, R.Hora_Fin,C.ID_Cancha 
+                                       FROM canchas C
+                                       INNER JOIN detalle_reserva DR ON DR.ID_Cancha = C.ID_Cancha
+                                       INNER JOIN reservas R ON R.ID_Reserva = DR.ID_Reserva
+                                       WHERE C.ID_Cancha = ? AND R.Fecha_Reserva = ?", [
+                                           $request->id,
+                                           $request->fechaReserva
+                                       ]);
+
+    // Obtener las canchas para enviarlas a la vista
+    $canchas = DB::select("SELECT C.ID_Cancha, C.nombre, C.estado_cancha, T.nombre_deporte, C.precio
+                            FROM canchas C
+                            INNER JOIN locales L ON L.ID_Local = C.ID_Local
+                            INNER JOIN canchatipo Ct ON C.ID_Cancha = Ct.ID_Cancha
+                            INNER JOIN tipo T ON T.ID_Tipo = Ct.ID_Tipo
+                            WHERE C.estado = 1");
+
+    foreach ($canchas as $cancha) {
+        $cancha->imagenes = DB::select("SELECT M.URL
+                                          FROM multimedia M
+                                          WHERE M.ID_Cancha = ?", [$cancha->ID_Cancha]);
+    }
+    session(['modal_open' => true, 'id_cancha' => $request->id]);
+    return view(".pages.canchas-by-locales", compact('horariosReservados', 'canchas'));
+}
     public function update(Request $request){
         $idUsuario = auth()->user()->id;
         try {
@@ -171,5 +199,38 @@ class GestionCancha extends Controller
         $pdf = Pdf::loadView('.pages.reportes.promocion', compact('canchasConDescuento'));
         return $pdf->stream();
     }
-    
+    public function rangoHorario(){
+        $local = auth()->user()->local;
+        $reportes = DB::select("WITH TotalReservasPorCancha AS (
+                                    SELECT
+                                        c.nombre AS cancha,
+                                        COUNT(*) AS total_reservas
+                                    FROM
+                                        reservas r
+                                    INNER JOIN detalle_reserva dr ON r.ID_Reserva = dr.ID_Reserva
+                                    INNER JOIN canchas c ON dr.ID_Cancha = c.ID_Cancha
+                                    WHERE
+                                        c.ID_Local = $local
+                                    GROUP BY
+                                        c.nombre
+                                )
+                                SELECT
+                                    t.cancha,
+                                    CONCAT(LPAD(HOUR(r.Hora_Inicio), 2, '0'), ':', LPAD(MINUTE(r.Hora_Inicio), 2, '0'), ' - ', 
+                                        LPAD(HOUR(r.Hora_Fin), 2, '0'), ':', LPAD(MINUTE(r.Hora_Fin), 2, '0')) AS rango_horario,
+                                    COUNT(*) AS total_reservas_rango,
+                                    CONCAT(ROUND((COUNT(*) / t.total_reservas) * 100, 2), '%') AS porcentaje_utilizacion
+                                FROM
+                                    reservas r
+                                INNER JOIN detalle_reserva dr ON r.ID_Reserva = dr.ID_Reserva
+                                INNER JOIN canchas c ON dr.ID_Cancha = c.ID_Cancha
+                                INNER JOIN TotalReservasPorCancha t ON c.nombre = t.cancha
+                                WHERE
+                                    c.ID_Local = $local
+                                GROUP BY
+                                    t.cancha, rango_horario;
+                                ");
+        $pdf = Pdf::loadView('.pages.reportes.canchasRangoHorario', compact('reportes'));
+        return $pdf->stream();
+    }
 }
