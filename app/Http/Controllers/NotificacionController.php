@@ -64,5 +64,16 @@ class NotificacionController extends Controller
     // Por ejemplo, redireccionar de vuelta con una notificación flash:
     return redirect()->back()->with('status', 'Notificación enviada: ' . $mensaje);
 }
+public function marcarComoLeida($id)
+    {
+        // Encontrar la notificación por su ID
+        $notificacion = auth()->user()->notifications()->findOrFail($id);
+        
+        // Marcarla como leída
+        $notificacion->markAsRead();
+        
+        // Redirigir al usuario a la página anterior o donde desees
+        return redirect()->back();
+    }
 
 }

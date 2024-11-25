@@ -7,7 +7,7 @@
     <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-icon.png">
     <link rel="icon" type="image/png" href="/img/favicon.png">
     <title>
-        Argon Dashboard 2 by Creative Tim
+        RESACO
     </title>
     <!--     Fonts and icons     -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -20,6 +20,7 @@
     <!-- CSS Files -->
     <link id="pagestyle" href="assets/css/argon-dashboard.css" rel="stylesheet"/>
     <link id="pagestyle" href="assets/css/style.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="assets/css/mobile.css" media="(max-width: 768px)">
 </head>
 
 <body class="{{ $class ?? '' }}">
@@ -33,7 +34,7 @@
             @yield('content')
         @else
             @if (!in_array(request()->route()->getName(), ['profile', 'profile-static']))
-                @if (auth()->user()->rol == 'admin' || auth()->user()->rol == 'cancha')
+                @if (auth()->user()->rol == 'admin' || auth()->user()->rol == 'personal')
                     <div class="min-height-300 bg-primary position-absolute w-100"></div>
                 @endif
             @elseif (in_array(request()->route()->getName(), ['profile-static', 'profile']))
@@ -41,7 +42,7 @@
                     <span class="mask bg-primary opacity-6"></span>
                 </div>
             @endif
-            @if (auth()->user()->rol == 'admin' || auth()->user()->rol == 'cancha' || auth()->user()->rol == 'usuario')
+            @if (auth()->user()->rol == 'admin' || auth()->user()->rol == 'personal' || auth()->user()->rol == 'usuario')
                 @include('layouts.navbars.auth.sidenav')
             @endif
            

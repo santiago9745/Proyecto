@@ -36,7 +36,7 @@ class ControllerCrud extends Controller
             $UserId = auth()->user()->id;
             $username = strtolower($request->nombre) . '.' . substr($request->primerApellido, 0, 1) . substr($request->segundoApellido, 0, 1);
             $password = Str::random(10);
-            $sql=DB::insert("INSERT INTO users(username,nombre,primerApellido,segundoApellido,email,rol,idUsuario,password,estado) VALUES(?,?,?,?,?,?,?,?,2)",[
+            $sql=DB::insert("INSERT INTO users(username,nombre,primerApellido,segundoApellido,email,rol,idUsuario,password,estado,telefono) VALUES(?,?,?,?,?,?,?,?,2,?)",[
                 $username,
                 strtoupper($request->nombre),
                 strtoupper($request->primerApellido),
@@ -44,7 +44,8 @@ class ControllerCrud extends Controller
                 $request->email,
                 $request->rol,
                 $UserId,
-                bcrypt($password)
+                bcrypt($password),
+                $request->numeroCelular
                 
             ]);
             $data = array(
@@ -69,13 +70,15 @@ class ControllerCrud extends Controller
             $id = $request->id;
     
             // Construimos la consulta SQL base
-            $sql = "UPDATE users SET username = ?, nombre = ?, primerApellido = ?, segundoApellido = ?, email = ?,fechaModificacion=CURRENT_TIMESTAMP()";
+            $sql = "UPDATE users SET username = ?, nombre = ?, primerApellido = ?, segundoApellido = ?, email = ?, telefono=?, rol=?, fechaModificacion=CURRENT_TIMESTAMP()";
             $params = [
                 $request->username,
                 strtoupper($request->nombre),
                 strtoupper($request->primerApellido),
                 strtoupper($request->segundoApellido),
-                $request->email
+                $request->email,
+                $request->numeroCelular,
+                $request->rol
             ];
     
             // Si la contraseña no está vacía, la agregamos a la consulta y a los parámetros
@@ -100,37 +103,5 @@ class ControllerCrud extends Controller
             return back()->with("incorrecto", "Error al actualizar el usuario");
         }
     }
-    public function reporteUsuarios(Request $request)
-    {
-        // Validamos que se reciban las fechas de inicio y fin
-        $request->validate([
-            'fecha_inicio' => 'required|date',
-            'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
-        ]);
-
-        // Obtenemos las fechas de inicio y fin del request
-        $fechaInicio = $request->input('fecha_inicio');
-        $fechaFin = $request->input('fecha_fin');
-        $idLocal = auth()->user()->local;
-        // Consulta SQL con filtrado por rango de fechas
-        $usuarios = DB::select("SELECT u.id, u.nombre AS nombre_usuario, u.email, COUNT(r.ID_Reserva) AS total_reservas
-            FROM users u
-            INNER JOIN reservas r ON u.id = r.id
-            INNER JOIN detalle_reserva DR ON r.ID_Reserva=DR.ID_Reserva
-            INNER JOIN canchas C ON C.ID_Cancha=DR.ID_Cancha
-            INNER JOIN locales l ON C.ID_Local = l.ID_Local
-            WHERE r.Estado_Reserva = 1
-            AND r.fecha_reserva BETWEEN ? AND ? -- Filtrado por rango de fechas
-            AND l.ID_Local = ?
-            GROUP BY u.id, u.nombre, u.email, l.nombre
-            ORDER BY total_reservas DESC
-        ", [$fechaInicio, $fechaFin, $idLocal]);
-
-
-        // Cargar la vista PDF con los usuarios filtrados
-        $pdf = Pdf::loadView('pages.reportes.reporteUsuarios', compact('usuarios', 'fechaInicio', 'fechaFin'));
-
-        // Retornar el PDF para ser visualizado
-        return $pdf->stream();
-    }
+    
 }

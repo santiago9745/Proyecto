@@ -42,11 +42,15 @@
                                             <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email">
                                         </div>
                                         <div class="mb-3">
+                                            <label for="exampleInputEmail1" class="form-label">Celular</label>
+                                            <input type="number" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="numeroCelular">
+                                        </div>
+                                        <div class="mb-3">
                                             <div class="mb-3">
                                                 <label for="disabledSelect" class="form-label">Rol</label>
                                                 <select id="disabledSelect" class="form-select" name="rol">
                                                   <option value="Admin">Admin</option>
-                                                  <option value="cancha">cancha</option>
+                                                  <option value="personal">Personal</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -69,6 +73,7 @@
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">primer Apellido</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">segundo Apellido</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Email</th>
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Numero de celular</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Rol</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Acciones</th>
                                 </tr>
@@ -94,6 +99,9 @@
                                     </td>
                                     <td class="align-middle text-center text-sm">
                                         <p class="text-sm font-weight-bold mb-0">{{$row->email}}</p>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        <p class="text-sm font-weight-bold mb-0">{{$row->telefono}}</p>
                                     </td>
                                     <td>
                                         <p class="text-sm font-weight-bold mb-0">{{$row->rol}}</p>
@@ -133,7 +141,23 @@
                                                                     <label for="exampleInputEmail1" class="form-label">Correo Electronico</label>
                                                                     <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email" value="{{$row->email}}">
                                                                 </div>
-                                                                
+                                                                <div class="mb-3">
+                                                                    <label for="exampleInputEmail1" class="form-label">Celular</label>
+                                                                    <input type="number" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="numeroCelular" value="{{$row->telefono}}">
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <div class="mb-3">
+                                                                        <label for="disabledSelect" class="form-label">Rol</label>
+                                                                        <select id="disabledSelect" class="form-select" name="rol">
+                                                                            <option value="{{$row->rol}}">{{$row->rol}}</option>
+                                                                            @if ($row->rol=='admin')
+                                                                                <option value="personal">Personal</option>
+                                                                            @else
+                                                                                <option value="admin">Admin</option>
+                                                                            @endif
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                                                                     <button type="submit" class="btn btn-primary">modificar</button>

@@ -1,6 +1,90 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+     /* Oculta el div por defecto */
+     .responsive-div {
+        display: none;
+    }
+
+    /* Muestra el div en pantallas menores a 766px */
+    @media (max-width: 992px) {
+        .responsive-div {
+            display: block;
+        }
+    }
+    .escritorio-div{
+        display: none;
+    }
+    @media (min-width: 993px){
+        .escritorio-div{
+            display: block;
+        }
+    }
+    
+    .table-responsive {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+@media (max-width: 576px) {
+    .custom-alert {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
+    @media (max-width: 768px) {
+    .carousel-inner img {
+        max-height: 200px;
+    }
+}
+/* Ajusta los márgenes en dispositivos pequeños */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 15px;
+    }
+    .scroll-container {
+        max-height: 400px;
+    }
+}
+
+/* Optimiza botones en pantallas pequeñas */
+@media (max-width: 576px) {
+    .btn {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+    .h6 {
+        font-size: 14px;
+    }
+}
+@media (max-width: 576px) {
+    .fa-map-signs, .fa-globe-americas {
+        font-size: 14px;
+    }
+    h5 {
+        font-size: 18px;
+    }
+    p {
+        font-size: 12px;
+    }
+}
+/* En pantallas más grandes a 1024px, los divs se muestran en 6 columnas */
+@media (min-width: 1120px) {
+    .col-md-6 {
+        width: 50%; /* 6 columnas en una fila */
+    }
+}
+
+/* En pantallas menores a 1024px, los divs se muestran en 12 columnas */
+@media (max-width: 1120px) {
+    .col-md-6 {
+        width: 100%; /* 12 columnas en una fila */
+    }
+}
+
+
+</style>
 <div class="image-slider">
     <img src="/assets/img/futbol-11.jpg" alt="Imagen deportiva 1">
     <img src="/assets/img/young-people-playing-basketball.jpg" alt="Imagen deportiva 2">
@@ -27,25 +111,25 @@
 
     <main>
         <section>
-            <div class="min-vh-45 mt-8">
-                <div class="container">
-                    <div class="row">
-                        <div class="scroll-container" style="max-height: 610px; overflow-y: auto;">
-                            <div class="row"> <!-- Asegúrate de tener una fila para los locales -->
-                                @foreach ($locales as $local)
-                                    <div class="col-md-6 col-sm-6">
-                                        <div class="card mb-5">
+            <div class="container-fluid responsive-div pt-7">
+                <div class="row">
+                    <div class="scroll-container" style="min-height: 30vh; max-height: 86vh; overflow-y: auto;">
+                        <div class="row"> <!-- Asegúrate de tener una fila para los locales -->
+                            @foreach ($locales as $local)
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <div class="card mb-5">
+                                        <div class="p-4">
                                             <div id="carousel{{ $local->ID_Local }}" class="carousel slide" data-bs-ride="carousel">
                                                 <div class="carousel-inner" style="min-height: 300px;">
                                                     @if (count($local->imagenes) > 0)
                                                         @foreach ($local->imagenes as $index => $imagen)
                                                             <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                                                <img src="{{ $imagen->URL }}" class="d-block w-100 img-fluid" alt="Imagen del local" style="object-fit: contain; max-height: 300px;">
+                                                                <img src="{{ $imagen->URL }}" alt="Imagen del local" class="img-fluid" style="max-height: 300px; width: 100%; object-fit: cover;">
                                                             </div>
                                                         @endforeach
                                                     @else
                                                         <div class="carousel-item active">
-                                                            <img src="{{ asset('img/imagen.jpg') }}" class="d-block w-100 img-fluid" alt="Imagen por defecto" style="object-fit: contain; max-height: 300px;">
+                                                            <img src="{{ asset('img/imagen.jpg') }}" alt="Imagen por defecto" style="max-height: 300px; width: 100%; object-fit: cover;">
                                                         </div>
                                                     @endif
                                                 </div>
@@ -63,10 +147,15 @@
                                                     <h5>{{ $local->nombre }}</h5>
                                                     <p><strong>Propietario:</strong> {{ $local->nombreCompleto }}</p>
                                                     <p><strong>Teléfono:</strong> {{ $local->telefono }}</p>
+                                                    <div style="display: flex; justify-content: center; align-items: center; gap: 20px; text-align: center;">
+                                                        <p><strong>Hora de apertura</strong><br> {{ $local->Hora_Apertura }}</p>
+                                                        <p><strong>Hora de cierre</strong><br> {{ $local->Hora_Cierre }}</p>
+                                                    </div>
                                                     <hr class="my-4">
                                                     <div class="h6 font-weight-light">
                                                         <i class="fas fa-map-signs text-muted"></i> {{ $local->direccion }}
                                                     </div>
+                                                    
                                                     <div class="h6 mt-2">
                                                         <i class="fas fa-globe-americas text-muted"></i> Coordenadas: 
                                                         <span class="text-muted">{{ $local->latitud }}, {{ $local->longitud }}</span>
@@ -81,11 +170,123 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        
+                                    </div>
+                                </div>
+
+                                <!-- Modal para agregar reservas -->
+                                <div class="modal fade" id="ModalAgregar{{ $local->ID_Local }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ $local->ID_Local }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel{{ $local->ID_Local }}">Agregar Reservas en {{ $local->nombre }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div style="max-height: 400px; overflow-y: auto;">
+                                                    <form id="reservaForm-{{ $local->ID_Local }}" method="POST" action="{{ route('reserva') }}">
+                                                        @csrf
+                                                        <table class="table table-bordered table-responsive">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Cancha</th>
+                                                                    <th>Precio</th>
+                                                                    <th>Fecha</th>
+                                                                    <th>Hora Inicio</th>
+                                                                    <th>Hora Fin</th>
+                                                                    <th>Acciones</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="reserva-container-{{ $local->ID_Local }}">
+                                                                <!-- Filas dinámicas de reservas -->
+                                                            </tbody>
+                                                        </table>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <div>
+                                                    <strong>Total: </strong><span id="total-{{ $local->ID_Local }}">0.00</span>
+                                                </div>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                                <button type="button" id="add-reserva-{{ $local->ID_Local }}" class="btn btn-primary">Agregar Reserva</button>
+                                                <button type="submit" id="saveReservas-{{ $local->ID_Local }}" class="btn btn-success">Guardar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <div class="container escritorio-div pt-8">
+                    <div class="row">
+                        <div class="scroll-container" style="min-height: 30vh; max-height: 80vh; overflow-y: auto;">
+                            <div class="row"> <!-- Asegúrate de tener una fila para los locales -->
+                                @foreach ($locales as $local)
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="card mb-5">
+                                            <div class="p-4">
+                                                <div id="carousel{{ $local->ID_Local }}" class="carousel slide" data-bs-ride="carousel">
+                                                    <div class="carousel-inner" style="min-height: 300px;">
+                                                        @if (count($local->imagenes) > 0)
+                                                            @foreach ($local->imagenes as $index => $imagen)
+                                                                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                                                    <img src="{{ $imagen->URL }}" alt="Imagen del local" class="img-fluid"style="max-height: 300px; width: 100%">
+                                                                </div>
+                                                            @endforeach
+                                                        @else
+                                                            <div class="carousel-item active">
+                                                                <img src="{{ asset('img/imagen.jpg') }}" alt="Imagen por defecto" style="max-height: 300px; width: 100%;">
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ $local->ID_Local }}" data-bs-slide="prev">
+                                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                        <span class="visually-hidden">Previous</span>
+                                                    </button>
+                                                    <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ $local->ID_Local }}" data-bs-slide="next">
+                                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                        <span class="visually-hidden">Next</span>
+                                                    </button>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="text-center mt-4">
+                                                        <h5>{{ $local->nombre }}</h5>
+                                                        <p><strong>Propietario:</strong> {{ $local->nombreCompleto }}</p>
+                                                        <p><strong>Teléfono:</strong> {{ $local->telefono }}</p>
+                                                        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; text-align: center;">
+                                                            <p><strong>Hora de apertura</strong><br> {{ $local->Hora_Apertura }}</p>
+                                                            <p><strong>Hora de cierre</strong><br> {{ $local->Hora_Cierre }}</p>
+                                                        </div>
+                                                        <hr class="my-4">
+                                                        <div class="h6 font-weight-light">
+                                                            <i class="fas fa-map-signs text-muted"></i> {{ $local->direccion }}
+                                                        </div>
+                                                        
+                                                        <div class="h6 mt-2">
+                                                            <i class="fas fa-globe-americas text-muted"></i> Coordenadas: 
+                                                            <span class="text-muted">{{ $local->latitud }}, {{ $local->longitud }}</span>
+                                                        </div>
+                                                        <div class="mt-4">
+                                                            <a href="{{route('getCanchaByLocalId', $local->ID_Local)}}" class="btn btn-sm btn-info">Reservar Canchas</a>
+                                                            {{-- <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#ModalAgregar{{ $local->ID_Local }}">
+                                                                Reservar Canchas
+                                                            </button> --}}
+                                                            <a href="https://maps.google.com/?q={{ $local->latitud }},{{ $local->longitud }}" target="_blank" class="btn btn-sm btn-success">Ver en el mapa</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
                                     </div>
     
                                     <!-- Modal para agregar reservas -->
                                     <div class="modal fade" id="ModalAgregar{{ $local->ID_Local }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ $local->ID_Local }}" aria-hidden="true">
-                                        <div class="modal-dialog modal-lg">
+                                        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                                             <div class="modal-content">
                                                 <div class="modal-header">
                                                     <h5 class="modal-title" id="exampleModalLabel{{ $local->ID_Local }}">Agregar Reservas en {{ $local->nombre }}</h5>
@@ -95,7 +296,7 @@
                                                     <div style="max-height: 400px; overflow-y: auto;">
                                                         <form id="reservaForm-{{ $local->ID_Local }}" method="POST" action="{{ route('reserva') }}">
                                                             @csrf
-                                                            <table class="table table-bordered">
+                                                            <table class="table table-bordered table-responsive">
                                                                 <thead>
                                                                     <tr>
                                                                         <th>Cancha</th>
@@ -132,7 +333,6 @@
                 </div>
             </section>
         </main>
-    </div>
     
     <style>
         .card-img-top {
@@ -248,6 +448,8 @@
             });
         @endforeach
     });
+       // Función para cambiar las clases de todos los divs generados dinámicamente
+       
 </script>
 
 

@@ -38,7 +38,7 @@ class LoginController extends Controller
                 return redirect()->intended('user-management');
             }
             else{
-                if (auth()->user()->rol== 'cancha') {
+                if (auth()->user()->rol== 'personal') {
                     $idlocal=auth()->user()->local;
                     Log::info('Evento de recordatorio de reserva está a punto de dispararse.');
                     $reservas = DB::select("SELECT R.ID_Reserva, R.Fecha_Reserva, R.Hora_Inicio, R.Hora_Fin, 

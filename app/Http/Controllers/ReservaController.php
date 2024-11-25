@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Mail\ReservaComprobanteMail;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\ReservaEstadoActualizado;
+use App\Notifications\EstadoActualizado;
+use App\Models\User; 
 
 class ReservaController extends Controller
 {
@@ -20,7 +23,7 @@ class ReservaController extends Controller
                                 L.longitud,
                                 M.URL,
                                 U.telefono,
-                                CONCAT(U.nombre,' ',U.primerApellido, ' ', U.segundoApellido) AS nombreCompleto
+                                CONCAT(U.nombre,' ',U.primerApellido, ' ', U.segundoApellido) AS nombreCompleto,L.Hora_Apertura,L.Hora_Cierre
                             FROM
                                 locales L
                             LEFT JOIN
@@ -36,7 +39,7 @@ class ReservaController extends Controller
         foreach ($locales as $local) {
             $local->imagenes = DB::select("SELECT M.URL
                                         FROM multimedia M
-                                        WHERE M.ID_Local = ?",
+                                        WHERE M.ID_Local = ? AND M.ID_Cancha IS NULL",
                                         [$local->ID_Local]);
         // Obtener las canchas asociadas a este local
         $local->canchas = DB::select("SELECT ID_Cancha, nombre, precio
@@ -103,12 +106,12 @@ class ReservaController extends Controller
 
     // Si el usuario tiene un local asignado
     if (!empty($idlocal)) {
-        $sql = DB::select("SELECT u.id,r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,u.nombre AS usuario_nombre,
+        $sql = DB::select("SELECT u.id,r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,u.nombre AS usuario_nombre,c.nombre AS nombreCancha, c.ID_Cancha,
                             u.email AS usuario_email, u.primerApellido, u.segundoApellido,
                             TIMESTAMPDIFF(DAY, NOW(), CONCAT(r.Fecha_Reserva, ' ', r.Hora_Inicio)) AS dias_restantes,
-                            TIMESTAMPDIFF(HOUR, NOW(), CONCAT(r.Fecha_Reserva, ' ', r.Hora_Inicio)) % 24 AS horas_restantes
+                            TIMESTAMPDIFF(HOUR, NOW(), CONCAT(r.Fecha_Reserva, ' ', r.Hora_Inicio)) % 24 AS horas_restantes,u.telefono
                             FROM locales l
-                            JOIN canchas c ON l.ID_Local = c.ID_Local
+                            JOIN canchas c ON l.ID_Local = c.ID_Local   
                             JOIN detalle_reserva dr ON c.ID_Cancha = dr.ID_Cancha
                             JOIN reservas r ON dr.ID_Reserva = r.ID_Reserva
                             JOIN users u ON r.id = u.id 
@@ -116,15 +119,16 @@ class ReservaController extends Controller
 
     // Si el usuario NO tiene un local asignado
     } else {
-        $sql = DB::select("SELECT L.nombre,r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,
+        $sql = DB::select("SELECT L.nombre,r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,C.nombre AS nombreCancha, c.ID_Cancha,
                             L.latitud,L.longitud,
                             TIMESTAMPDIFF(DAY, NOW(), CONCAT(r.Fecha_Reserva, ' ', r.Hora_Inicio)) AS dias_restantes,
                             TIMESTAMPDIFF(HOUR, NOW(), CONCAT(r.Fecha_Reserva, ' ', r.Hora_Inicio)) % 24 AS horas_restantes,
-                            r.fecha_creacion
+                            r.fecha_creacion,u.telefono
                             FROM reservas r
                             INNER JOIN detalle_reserva D ON D.ID_Reserva=r.ID_Reserva
                             INNER JOIN canchas C ON C.ID_Cancha=D.ID_Cancha
                             INNER JOIN locales L ON L.ID_Local=C.ID_Local 
+                            INNER JOIN users u ON L.ID_Local = U.local 
                             WHERE r.id = ?", [$idUsuario]);
     }
         return view('.pages.reservas', ['sql' => $sql]);
@@ -136,15 +140,25 @@ class ReservaController extends Controller
         ]);
 
         DB::table('reservas')
+            
             ->where('ID_Reserva', $id)
             ->update(['Estado_Reserva' => $request->Estado_Reserva]);
+        $reserva = DB::table('reservas')
+        ->join('detalle_reserva', 'detalle_reserva.ID_Reserva', '=', 'reservas.ID_Reserva')
+        ->join('canchas', 'canchas.ID_Cancha', '=', 'detalle_reserva.ID_Cancha')
+        ->join('locales', 'locales.ID_Local', '=', 'canchas.ID_Local')
+        ->where('reservas.ID_Reserva', '=', $id)
+        ->select('reservas.ID_Reserva', 'locales.nombre as nombre_local','reservas.id')
+        ->first();
+        //Mail::to($request->email)->send(new ReservaEstadoActualizado($reserva, $request->Estado_Reserva));
+        $usuario = User::find($reserva->id); // Asume que hay una columna 'ID_Usuario' en la tabla 'reservas'
+        $usuario->notify(new EstadoActualizado($reserva, $request->Estado_Reserva));
 
         return redirect()->back()->with('success', 'Estado de la reserva actualizado correctamente.');
     }
     public function cancelar($id)
     {
-            $sql = DB::update("UPDATE reservas SET estado_reserva = ? WHERE ID_Reserva = ?", [
-                'Cancelada', // Cambia el estado a 'Cancelado'
+            $sql = DB::update("UPDATE reservas SET estado_reserva = 0 WHERE ID_Reserva = ?", [
                 $id // ID de la reserva pasada desde la solicitud
             ]);
 
@@ -164,14 +178,14 @@ class ReservaController extends Controller
     $reservas = DB::select("SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,
                         L.nombre AS nombre_local, CONCAT(u.nombre,' ',u.primerApellido,' ',u.segundoApellido) AS nombre_cliente, 
                         u.email AS email_cliente, r.fecha_creacion, c.precio,
-                        TIMESTAMPDIFF(MINUTE, r.Hora_Inicio, r.Hora_Fin) / 60 * c.precio AS total_por_reserva
+                        c.precio AS total_por_reserva
                     FROM reservas r
                     INNER JOIN detalle_reserva dr ON r.ID_Reserva = dr.ID_Reserva
                     INNER JOIN canchas c ON dr.ID_Cancha = c.ID_Cancha
                     INNER JOIN locales L ON c.ID_Local = L.ID_Local
                     INNER JOIN users u ON r.id = u.id
                     WHERE u.id = ? -- Usa el ID del usuario autenticado
-                    AND r.estado_reserva = 1
+                    AND r.estado_reserva IN (1, 2)
                     AND DATE(r.Fecha_Reserva) = DATE(?)
                     ORDER BY r.Fecha_Reserva DESC;", [$usuarioId, $fechaCreacion]);
 
@@ -183,23 +197,39 @@ class ReservaController extends Controller
     {
         $id=$request->id;
         $fecha=$request->fechReserva;
-        $reservas = DB::select("SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,
-                    L.nombre AS nombre_local, 
-                    CONCAT(u.nombre,' ',u.primerApellido,' ',u.segundoApellido) AS nombreCompleto, 
-                    u.email AS email_cliente,
-                    r.fecha_creacion, c.precio,
-                    TIMESTAMPDIFF(MINUTE, r.Hora_Inicio, r.Hora_Fin) / 60 * c.precio AS total_por_reserva,
-                    P.descuento, P.Fecha_Inicio, P.Fecha_Fin
-                FROM reservas r
-                INNER JOIN detalle_reserva dr ON r.ID_Reserva = dr.ID_Reserva
-                INNER JOIN canchas c ON dr.ID_Cancha = c.ID_Cancha
-                INNER JOIN locales L ON c.ID_Local = L.ID_Local
-                LEFT JOIN precios P ON P.ID_Local = L.ID_Local 
-                    AND CURDATE() BETWEEN P.Fecha_Inicio AND P.Fecha_Fin 
-                INNER JOIN users u ON r.id = u.id
-                WHERE r.id = ?
-                AND r.estado_reserva = 1
-                AND DATE(r.Fecha_Reserva) = ?;", [$id, $fecha]);
+        $reservas = DB::select("SELECT 
+    r.ID_Reserva, 
+    r.Fecha_Reserva, 
+    r.Hora_Inicio, 
+    r.Hora_Fin, 
+    r.Estado_Reserva,
+    L.nombre AS nombre_local, 
+    CONCAT(u.nombre, ' ', u.primerApellido, ' ', u.segundoApellido) AS nombreCompleto, 
+    u.email AS email_cliente,
+    r.fecha_creacion, 
+    c.precio,
+    c.precio * (1 - IFNULL(P.descuento, 0) / 100) AS total_por_reserva, 
+    P.descuento, 
+    P.Fecha_Inicio, 
+    P.Fecha_Fin
+FROM 
+    reservas r
+INNER JOIN 
+    detalle_reserva dr ON r.ID_Reserva = dr.ID_Reserva
+INNER JOIN 
+    canchas c ON dr.ID_Cancha = c.ID_Cancha
+INNER JOIN 
+    locales L ON c.ID_Local = L.ID_Local
+LEFT JOIN 
+    precios P ON P.ID_Cancha = c.ID_Cancha 
+    AND '$fecha' BETWEEN P.Fecha_Inicio AND P.Fecha_Fin
+INNER JOIN 
+    users u ON r.id = u.id
+WHERE 
+    r.id = ?
+    AND r.estado_reserva IN (1, 3)
+    AND DATE(r.Fecha_Reserva) = ?;
+", [$id, $fecha]);
         $pdf = Pdf::loadView('.pages.reportes.comprobante', compact('reservas'));
         return $pdf->stream();
     }
@@ -209,23 +239,38 @@ class ReservaController extends Controller
         $fecha = $request->fechaRserva; // Cambié el nombre de la variable a fechaRserva
         $email = $request->email; // Asegúrate de que el nombre sea 'email'
         
-        $reservas = DB::select("SELECT r.ID_Reserva, r.Fecha_Reserva, r.Hora_Inicio, r.Hora_Fin, r.Estado_Reserva,
-                    L.nombre AS nombre_local, 
-                    CONCAT(u.nombre,' ',u.primerApellido,' ',u.segundoApellido) AS nombreCompleto, 
-                    u.email AS email_cliente,
-                    r.fecha_creacion, c.precio,
-                    TIMESTAMPDIFF(MINUTE, r.Hora_Inicio, r.Hora_Fin) / 60 * c.precio AS total_por_reserva,
-                    P.descuento, P.Fecha_Inicio, P.Fecha_Fin
-                FROM reservas r
-                INNER JOIN detalle_reserva dr ON r.ID_Reserva = dr.ID_Reserva
-                INNER JOIN canchas c ON dr.ID_Cancha = c.ID_Cancha
-                INNER JOIN locales L ON c.ID_Local = L.ID_Local
-                LEFT JOIN precios P ON P.ID_Local = L.ID_Local 
-                    AND CURDATE() BETWEEN P.Fecha_Inicio AND P.Fecha_Fin 
-                INNER JOIN users u ON r.id = u.id
-                WHERE r.id = ?
-                AND r.estado_reserva = 1
-                AND DATE(r.Fecha_Reserva) = ?;", [$id, $fecha]);
+        $reservas = DB::select("SELECT 
+    r.ID_Reserva, 
+    r.Fecha_Reserva, 
+    r.Hora_Inicio, 
+    r.Hora_Fin, 
+    r.Estado_Reserva,
+    L.nombre AS nombre_local, 
+    CONCAT(u.nombre, ' ', u.primerApellido, ' ', u.segundoApellido) AS nombreCompleto, 
+    u.email AS email_cliente,
+    r.fecha_creacion, 
+    c.precio,
+    c.precio * (1 - IFNULL(P.descuento, 0) / 100) AS total_por_reserva, 
+    P.descuento, 
+    P.Fecha_Inicio, 
+    P.Fecha_Fin
+FROM 
+    reservas r
+INNER JOIN 
+    detalle_reserva dr ON r.ID_Reserva = dr.ID_Reserva
+INNER JOIN 
+    canchas c ON dr.ID_Cancha = c.ID_Cancha
+INNER JOIN 
+    locales L ON c.ID_Local = L.ID_Local
+LEFT JOIN 
+    precios P ON P.ID_Cancha = c.ID_Cancha 
+    AND '$fecha' BETWEEN P.Fecha_Inicio AND P.Fecha_Fin
+INNER JOIN 
+    users u ON r.id = u.id
+WHERE 
+    r.id = ?
+    AND r.estado_reserva IN (1, 3)
+    AND DATE(r.Fecha_Reserva) = ?;", [$id, $fecha]);
 
         $pdf = Pdf::loadView('.pages.reportes.comprobante', compact('reservas'));
         $pdfContent = $pdf->output();
@@ -251,46 +296,4 @@ class ReservaController extends Controller
             return back()->with("incorrecto","Error al eliminar un usuario");
         }
     }
-    public function reporteIngresos(Request $request){
-       $reservas = DB::select("SELECT
-    (c.precio * (1 - COALESCE(p.descuento, 0) / 100)) AS Precio_Final, 
-    r.ID_Reserva,
-    r.Fecha_Reserva,
-    r.Hora_Inicio,
-    r.Hora_Fin,
-    c.nombre AS Nombre_Cancha,
-    l.direccion AS Direccion_Local,
-    l.nombre AS Nombre_Local,
-    c.precio AS Precio_Base,
-    COALESCE(p.descuento, 0) AS Descuento,
-    CONCAT(u.nombre, ' ', u.primerApellido, ' ', u.segundoApellido) AS Nombre_Usuario
-FROM 
-    reservas r
-JOIN 
-    detalle_reserva dr ON r.ID_Reserva = dr.ID_Reserva
-JOIN 
-    canchas c ON dr.ID_Cancha = c.ID_Cancha
-JOIN 
-    locales l ON c.ID_Local = l.ID_Local
-LEFT JOIN 
-    precios p ON p.ID_Local = l.ID_Local
-    AND r.Fecha_Reserva BETWEEN p.fecha_inicio AND p.fecha_fin
-JOIN 
-    users u ON r.id = u.id
-WHERE 
-    r.Fecha_Reserva BETWEEN ? AND ?
-    AND r.Estado_Reserva = 4;
-",[
-                            $request->fecha_inicio,
-                            $request->fecha_fin
-                        ]); 
-
-        // Generar el PDF
-        $pdf = PDF::loadView('.pages.reportes.ingresos', compact('reservas'));
-    
-        return $pdf->stream();
-    }
-    
-
-
 }

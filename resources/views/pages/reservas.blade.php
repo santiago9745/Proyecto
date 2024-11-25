@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-@if (in_array(auth()->user()->rol, ['cancha', 'admin']))
+@if (in_array(auth()->user()->rol, ['personal', 'admin']))
     @include('layouts.navbars.auth.topnav', ['title' => 'Reportes'])
 @else
     @include('layouts.navbars.guest.navbar')
@@ -37,9 +37,14 @@
 </style>
 
 <div class="row mt-4 mx-4">
-    <div class="col-12">
-        <div class="card mb-4">
-            <div class="card-body px-0 pt-7 pb-2">
+    @if (auth()->user()->rol=="personal")
+        <div class="col-12">
+    @else
+        <div class="col-12 pt-7">
+    @endif
+    
+        <div class="card ">
+            <div class="card-body px-0 pb-2 m-2">
                 <div class="table-responsive p-0">
                     <div class="calendar-container"> <!-- Contenedor para el scroll -->
                         <div id="calendar"></div>
@@ -70,9 +75,19 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
-
+    function getResponsiveView() {
+        const width = window.innerWidth;
+        if (width < 601) {
+            return 'listDay'; // Vista de lista para pantallas pequeñas
+        } else if (width < 991) {
+            return 'dayGridWeek'; // Vista semanal para pantallas medianas
+        } else {
+            return 'dayGridMonth'; // Vista mensual para pantallas grandes
+        }
+    }
     var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
+        initialView: getResponsiveView(),
+        lang:'es',
         locale: 'es',
         dayHeaderFormat: { weekday: 'long' },
         events: [
@@ -85,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         @endif`,
                 start: '{{ $row->Fecha_Reserva }}T{{ $row->Hora_Inicio }}',
                 end: '{{ $row->Fecha_Reserva }}T{{ $row->Hora_Fin }}',
-                color: '{{ $row->Estado_Reserva == "1" ? "green" : ($row->Estado_Reserva == "2" ? "orange" : ($row->Estado_Reserva == "4" ? "blue" : "red")) }}',
+                color: '{{ $row->Estado_Reserva == "1" || $row->Estado_Reserva == "3" ? "green" : ($row->Estado_Reserva == "2" ? "orange" : ($row->Estado_Reserva == "4" ? "blue" : "red")) }}',
                 extendedProps: {
                     @if (!empty(auth()->user()->local))
                         diasRestantes: '{{ $row->dias_restantes }}', // Asegúrate de que los días restantes estén en la consulta SQL
@@ -97,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     fechaReserva: '{{ $row->Fecha_Reserva }}',
                     horaInicio: '{{ $row->Hora_Inicio }}',
                     horaFin: '{{ $row->Hora_Fin }}',
-                    estadoReserva: '{{ $row->Estado_Reserva }}',
+                    
                     @if (!empty(auth()->user()->local)) 
                         nombreCliente: '{{ $row->usuario_nombre }}',
                         emailCliente: '{{ $row->usuario_email }}',
@@ -109,11 +124,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         fechaCreacion: '{{ $row->fecha_creacion }}',
                     @endif
                     idReserva: '{{ $row->ID_Reserva }}', // Agregamos el ID de la reserva aquí
-                    
+                    nombreCancha: '{{$row->nombreCancha}}',
+                    estadoReserva: '{{ $row->Estado_Reserva }}',
+                    idCancha: '{{ $row->ID_Cancha}}',
+                    telefonoCliente: '{{ $row->telefono }}',
                 }
             },
             @endforeach
         ],
+        
         eventClick: function(info) {
             var props = info.event.extendedProps;
             var now = new Date();
@@ -133,12 +152,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Mostrar los detalles de la reserva
             document.getElementById('infoReservaContent').innerHTML = `
-                ${props.nombreLocal ? `<p><strong>Nombre del Local:</strong> ${props.nombreLocal}</p>` : ''}
+                ${props.nombreLocal ? `
+                <div class="d-flex mb-2">
+                    <p class="me-3"><strong>Nombre del Local:</strong> ${props.nombreLocal}</p>
+                    <p><strong>Cancha Reservada:</strong> ${props.nombreCancha}</p>
+                </div>
+                    ` : ''}
+                
                 
                 ${props.nombreCliente ? `
-                    <div class="d-flex mb-2">
+                    <div class="d-flex">
                         <p class="me-3"><strong>Nombre del Cliente:</strong> ${props.nombreCliente}</p>
                         <p><strong>Email del Cliente:</strong> ${props.emailCliente || 'No disponible'}</p>
+                    <p><strong>Cancha Reservada:</strong> ${props.nombreCancha}</p>
                     </div>
                 ` : ''}
                 
@@ -147,11 +173,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p class="me-3 ms-3"><strong>Hora de Inicio:</strong> ${props.horaInicio}</p>
                     <p><strong>Hora de Fin:</strong> ${props.horaFin}</p>
                 </div>
+                <p class="me-3"><strong>Estado de Reserva:</strong> ${props.estadoReserva == 1 ? 'Confirmado' : 
+                props.estadoReserva == 2 ? 'Pendiente' :
+                props.estadoReserva == 4 ? 'Pagado' :
+                props.estadoReserva == 3 ? 'Confirmado' :
+                'Cancelado'}</p>
+                
             `;
 
             document.getElementById('infoReservaContent').innerHTML += `
                 <div class="d-flex">
-                    <p class="me-3"><strong>Estado de Reserva:</strong> ${props.estadoReserva}</p>
                     <p><strong>Tiempo restante:</strong>
                         ${diferenciaMs >= 0
                             ? `<span style="color: ${color};">Quedan ${diasRestantes} días y ${horasRestantes} horas</span>`
@@ -163,10 +194,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Sección de formulario y WhatsApp
             document.getElementById('infoReservaContent').innerHTML += `
-            @if (!empty(auth()->user()->local))
+            @if (!empty(auth()->user()->local)) 
+            
                 <form action="/reservas/${props.idReserva}" method="POST">
                     @csrf
                     @method('PUT')
+                    <input type="hidden" name="email" value="${props.emailCliente}">
                     <select name="Estado_Reserva" class="form-control" onchange="this.form.submit()">
                         <option value="2" ${props.estadoReserva === '2' ? 'selected' : ''}>Pendiente</option>
                         <option value="1" ${props.estadoReserva === '1' ? 'selected' : ''}>Confirmada</option>
@@ -174,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </select>
                 </form>
                 <div class="d-flex align-items-center">
-                <a href="https://wa.me/591${props.telefonoCliente}?text=Hola%20${encodeURIComponent(props.nombreCliente)},%20gracias%20por%20reservar%20con%20nosotros.%20Tu%20reserva%20es%20para%20el%20${props.fechaReserva}%20a%20las%20${props.horaInicio}" 
+                <a href="https://wa.me/591${props.telefonoCliente}" 
                     target="_blank" 
                     class="btn btn-success mt-2 me-3 btn-sm">
                     Comunícate por WhatsApp
@@ -184,6 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     @csrf
                     <input type="hidden" name="id" value="${props.idUsuario}">
                     <input type="hidden" name="fechReserva" value="${props.fechaReserva}">
+                    <input type="hidden" name="idCancha" value="${props.idCancha}">
                     <button type="submit" class="btn btn-outline-success mt-3 btn-sm">
                         <i class="fas fa-chart-bar me-2"></i> Comprobante
                     </button>
@@ -211,17 +245,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 ${!props.latitud && !props.longitud ? `<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ModalDireccion">
                     <i class="fas fa-map-marker-alt"></i> Ubicación del local
                 </button>` : ''}
-                <div class="d-flex mt-3">
-                    <form action="/reservasCancel/${props.idReserva}" method="POST" onsubmit="return confirmarCancelacion()">
-                        @csrf
-                        @method('PUT') <!-- Cambia a PUT si es necesario -->
-                        <button type="submit" class="btn btn-danger">Cancelar Reserva</button>
-                    </form>
-                    <form action="{{ route('Cotizacion') }}" method="POST">
-                        @csrf
-                        <input type="text" name="fecha_creacion" value="${props.fechaReserva}">
-                        <button type="submit" class="btn btn-outline-success mt-2">Generar Cotización</button>
-                    </form>
+                <div class="d-flex flex-row flex-wrap mt-3">
+                    <div>
+                        <form action="/reservasCancel/${props.idReserva}" method="POST" onsubmit="return confirmarCancelacion()">
+                            @csrf
+                            @method('PUT') <!-- Cambia a PUT si es necesario -->
+                            <button type="submit" class="btn btn-danger">Cancelar Reserva</button>
+                        </form>
+                    </div>
+                    
+                    <a href="https://wa.me/591${props.telefonoCliente}" 
+                    target="_blank" 
+                    class="btn btn-success me-3 ms-2">
+                    Comunícate por WhatsApp
+                </a>
 
                 </div>
             @endif
@@ -249,6 +286,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     map.invalidateSize();
                 });
             }
+        },
+        
+        windowResize: function() {
+            calendar.changeView(getResponsiveView()); // Cambia la vista en función del tamaño de la ventana
         }
     });
 

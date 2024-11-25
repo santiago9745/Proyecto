@@ -108,7 +108,7 @@
                                         <!-- Campo para mensaje personalizado -->
                                         <div class="mb-3">
                                             <label class="form-label">Mensaje personalizado</label>
-                                            <textarea class="form-control" name="mensaje" rows="3" required></textarea>
+                                            <textarea class="form-control" name="mensaje" rows="5" required style="resize: none"></textarea>
                                         </div>
 
                                         <div class="modal-footer">

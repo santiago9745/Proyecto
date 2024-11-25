@@ -60,7 +60,7 @@
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nombre</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Disponibilidad</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tipo deporte</th>
-                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Precio de la cancha en Bs.</th>
+                            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Precio de la cancha en Bs por cada 30 minutos.</th>
                             <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Editar/Eliminar</th>
                         </tr>
                     </thead>

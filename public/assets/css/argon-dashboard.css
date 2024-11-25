@@ -4714,7 +4714,7 @@ textarea.form-control-lg {
     overflow-y: visible;
   }
 }
-@media (min-width: 992px) {
+@media (min-width: 1024px) {
   .navbar-expand-lg {
     flex-wrap: nowrap;
     justify-content: flex-start;
@@ -21793,7 +21793,7 @@ hr.horizontal.gray-light {
 .sidenav .navbar-heading {
   display: block;
 }
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
   .sidenav:hover {
     max-width: 15.625rem;
   }

@@ -66,8 +66,8 @@
                 <th>Fecha de Reserva</th>
                 <th>Hora de Inicio</th>
                 <th>Hora de Fin</th>
-                <th>Estado</th>
-                <th>Total por Reserva (Bs)</th>
+                <th>Cancha reservada</th>
+                <th>Total (Bs) por 30 Minutos</th>
             </tr>
         </thead>
         <tbody>
@@ -76,14 +76,14 @@
             @endphp
             @foreach ($reservas as $reserva)
                 @php
-                    $totalGeneral += $reserva->total_por_reserva; // Sumar el total por reserva
+                    $totalGeneral = $reserva->total_por_reserva; // Sumar el total por reserva
                 @endphp
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($reserva->Fecha_Reserva)->format('d/m/Y') }}</td>
                     <td>{{ \Carbon\Carbon::parse($reserva->Hora_Inicio)->format('H:i') }}</td>
                     <td>{{ \Carbon\Carbon::parse($reserva->Hora_Fin)->format('H:i') }}</td>
-                    <td>{{ $reserva->Estado_Reserva }}</td>
-                    <td>{{ number_format($reserva->total_por_reserva, 2) }} Bs</td>
+                    <td>{{$reserva->nombre_cancha}}</td>
+                    <td>{{ number_format($reserva->precio_por_30_mins, 2) }} Bs</td>
                 </tr>
             @endforeach
         </tbody>
@@ -95,7 +95,7 @@
         </tfoot>
     </table>
 
-    <p style="text-align: center; font-size: 14px; margin-top: 10px; color: #dc3545;">
-        El monto total mostrado no incluye ningún descuento.
+    <p style="text-align: left; font-size: 14px; margin-top: 10px;">
+        <strong>Nota:</strong> El total mostrado corresponde al precio calculado por intervalos de 30 minutos.
     </p>
 </div>

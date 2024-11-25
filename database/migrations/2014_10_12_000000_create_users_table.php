@@ -27,7 +27,6 @@ return new class extends Migration
             $table->timestamp('fechaCreacion')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('fechaModificacion')->nullable()->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
             $table->unsignedBigInteger('local')->nullable();
-            $table->foreign('local')->references('ID_Local')->on('locales');
         });
     }
 

@@ -61,7 +61,6 @@
                             <thead>
                                 <tr>
                                     <th>Nombre Cancha</th>
-                                    <th>Estado</th>
                                         <th>Descuento (%)</th>
                                         <th>Fecha Inicio</th>
                                         <th>Fecha Fin</th>

@@ -91,26 +91,24 @@
                 $totalGeneral = 0; // Inicializar el total general
             @endphp
             @foreach ($reservas as $reserva)
-                @php
-                    // Calcular el total con descuento
-                    $totalConDescuento = $reserva->total_por_reserva * (1 - ($reserva->descuento / 100));
-                    $totalGeneral += $totalConDescuento; // Sumar el total con descuento
+            @php
+                    $totalGeneral += $reserva->total_por_reserva; // Sumar total_por_reserva
                 @endphp
                 <tr>
                     <td>{{ \Carbon\Carbon::parse($reserva->Fecha_Reserva)->format('d/m/Y') }}</td>
                     <td>{{ \Carbon\Carbon::parse($reserva->Hora_Inicio)->format('H:i') }}</td>
                     <td>{{ \Carbon\Carbon::parse($reserva->Hora_Fin)->format('H:i') }}</td>
                     <td>{{ $reserva->Estado_Reserva }}</td>
-                    <td>{{ number_format($reserva->total_por_reserva, 2) }} Bs</td>
+                    <td>{{ number_format($reserva->precio) }} Bs</td>
                     <td>{{ $reserva->descuento }}%</td>
-                    <td>{{ number_format($totalConDescuento, 2) }} Bs</td>
+                    <td>{{ number_format($reserva->total_por_reserva,2)}} Bs</td>
                 </tr>
             @endforeach
         </tbody>
         <tfoot>
             <tr>
                 <th colspan="6" class="text-right">Total General:</th>
-                <th class="text-right">{{ number_format($totalGeneral, 2) }} Bs</th>
+                <th class="text-right"> {{ number_format($totalGeneral, 2) }} Bs</th>
             </tr>
         </tfoot>
     </table>

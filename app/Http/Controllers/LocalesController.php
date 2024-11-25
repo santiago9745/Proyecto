@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\facades\DB;
 
-class CanchasController extends Controller
+class LocalesController extends Controller
 {
     public function index(){
         $sql=DB::select("SELECT * FROM locales WHERE estado=1");
@@ -36,9 +36,11 @@ class CanchasController extends Controller
     public function update(Request $request){
         try {
             $idUsuario = auth()->user()->id;
-            $sql=DB::insert("UPDATE locales SET nombre=?, direccion=?, fechaModificacion=CURRENT_TIMESTAMP, idUsuario=$idUsuario WHERE ID_Local=?",[
+            $sql=DB::insert("UPDATE locales SET nombre=?, direccion=?, fechaModificacion=CURRENT_TIMESTAMP, idUsuario=$idUsuario,latitud=?, longitud=? WHERE ID_Local=?",[
                 strtoupper($request->nombre),
                 strtoupper($request->direccion),
+                $request->latitud,
+                $request->longitud,
                 $request->id
             ]);
         } catch (\Throwable $th) {
@@ -99,7 +101,7 @@ class CanchasController extends Controller
     public function showMap()
     {
         // Obtén la lista de locales con sus coordenadas
-        $locales = DB::select("SELECT L.nombre AS nombreLocal, L.direccion, U.nombre AS nombreUsuario, U.email, U.telefono,L.latitud,L.longitud
+        $locales = DB::select("SELECT L.ID_Local,L.nombre AS nombreLocal, L.direccion, U.nombre AS nombreUsuario, U.email, U.telefono,L.latitud,L.longitud
                                 FROM locales L
                                 INNER JOIN users U ON L.ID_Local = U.local;");
 

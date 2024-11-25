@@ -42,6 +42,18 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Hora de apertura del local</label>
+                                            <input class="form-control" type="time" name="horaApertura" value="{{ $row->Hora_Apertura }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="example-text-input" class="form-control-label">Hora de cierre del local</label>
+                                            <input class="form-control" type="time" name="horaCierre" value="{{ $row->Hora_Cierre }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
                                             <label for="imagen" class="form-control-label">Imágenes</label>
                                             <input class="form-control" type="file" id="imagen" name="imagenes[]" accept="image/jpeg, image/png" multiple>
                                         </div>
@@ -137,6 +149,10 @@
                                 <h5>{{ $row->nombre }}</h5>
                                 <p><strong>Propietario:</strong> {{ $row->nombreCompleto }}</p>
                                 <p><strong>Teléfono:</strong> {{ $row->telefono }}</p>
+                                <div style="display: flex; gap: 10px;">
+                                    <p><strong>Hora de apertura:</strong> {{ $row->Hora_Apertura }}</p>
+                                    <p><strong>Hora de cierre:</strong> {{ $row->Hora_Cierre }}</p>
+                                </div>
                                 <hr class="my-4">
                                 <div class="h6 font-weight-light">
                                     <i class="fas fa-map-signs text-muted"></i> {{ $row->direccion }}
@@ -146,7 +162,7 @@
                                     <span class="text-muted">{{ $row->latitud }}, {{ $row->longitud }}</span>
                                 </div>
                                 <div class="mt-4">
-                                    <a href="#" class="btn btn-sm btn-info">Ver detalles</a>
+                                    <a href="#" class="btn btn-sm btn-info">Reservar Canchas</a>
                                     <a href="https://maps.google.com/?q={{ $row->latitud }},{{ $row->longitud }}" target="_blank" class="btn btn-sm btn-success">Ver en el mapa</a>
                                 </div>
                             </div>

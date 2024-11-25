@@ -52,8 +52,12 @@
                                                 <div class="form-group">
                                                     <label for="estado" class="form-control-label">Estado de la Cancha</label>
                                                     <select class="form-control" name="estado" id="estado">
-                                                        <option value="Disponible" {{ $row->estado_cancha == 'Disponible' ? 'selected' : '' }}>Disponible</option>
-                                                        <option value="No Disponible" {{ $row->estado_cancha == 'No Disponible' ? 'selected' : '' }}>No Disponible</option>
+                                                        <option value="{{$row->estado_cancha}}">{{$row->estado_cancha}}</option>
+                                                            @if ($row->estado_cancha=='DISPONIBLE')
+                                                                <option value="No Disponible">NO DISPONIBLE</option>
+                                                            @else
+                                                                <option value="Disponible">DISPONIBLE</option>
+                                                            @endif
                                                     </select>
                                                 </div>
                                             </div>
@@ -141,7 +145,7 @@
                                     <div class="carousel-inner" style="min-height: 300px;">
                                         @foreach ($imagenes_canchas as $index => $imagen)
                                             @if ($imagen->ID_Cancha == $row->ID_Cancha)
-                                                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                                                <div class="carousel-item {{ $index <= 1 ? 'active' : '' }}">
                                                     <img src="{{ $imagen->URL }}" class="d-block w-100 img-fluid" alt="Imagen de la cancha" style="object-fit: contain; max-height: 300px;">
                                                 </div>
                                             @endif
@@ -162,7 +166,7 @@
                                         <h5>{{ $row->nombreCancha }}</h5>
                                         <p><strong>Estado:</strong> {{ $row->estado_cancha }}</p>
                                         <p><strong>Tipo de deporte:</strong> {{ $row->nombre_deporte }}</p>
-                                        <p><strong>Precio:</strong> {{ $cancha->precio }}</p>
+                                        <p><strong>Precio:</strong> {{ $row->precio }}</p>
                                         <hr class="my-4">
                                     </div>
                                 </div>

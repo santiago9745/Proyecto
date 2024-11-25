@@ -17,6 +17,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>               
 @endif
+
+
     <div class="container position-sticky z-index-sticky top-0">
         <div class="row">
             <div class="col-12">
@@ -32,6 +34,64 @@
                     <div class="row">
                         <div class="scroll-container" style="max-height: 610px; overflow-y: auto;">
                             <div class="row"> <!-- Asegúrate de tener una fila para los locales -->
+                                <div class="card mb-5 pt-3">
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalReservas">
+                                        Ver Reservas Acumuladas
+                                    </button>
+                                </div>
+                                <!-- Modal para mostrar las reservas acumuladas -->
+                                <div class="modal fade" id="ModalReservas" tabindex="-1" aria-labelledby="ModalReservasLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="ModalReservasLabel">Reservas Acumuladas</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Cancha</th>
+                                                            <th>Fecha</th>
+                                                            <th>Hora Inicio</th>
+                                                            <th>Hora Fin</th>
+                                                            <th>Precio por Media Hora (en Bs)</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @php
+                                                            $total = 0; // Inicializa el total
+                                                        @endphp
+                                                        @foreach ($reservas as $reserva)
+                                                            <tr>
+                                                                <td>{{ $reserva->nombre}}</td>
+                                                                <td>{{ $reserva->Fecha_Reserva}}</td>
+                                                                <td>{{ $reserva->Hora_Inicio}}</td>
+                                                                <td>{{ $reserva->Hora_Fin}}</td>
+                                                                <td style="text-align: center;">{{ $reserva->precio}}</td>
+                                                            </tr>
+                                                            @php
+                                                                $total += $reserva->precio;  
+                                                            @endphp
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                                <div class="text-end mt-3 me-7">
+                                                    <strong>Total: {{ $total }} Bs.</strong>
+                                                </div>  
+                                            </div>
+                                            <div class="modal-footer">
+                                                
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                                <form action="{{ route('moveReservationsToPermanent')}}" method="POST" id="formReservas" target="_blank">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-primary">Guardar Reservas</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 @foreach ($canchas as $cancha)
                                     <div class="col-md-6 col-sm-6">
                                         <div class="card mb-5">
@@ -51,7 +111,7 @@
                                             </div>
                                         </div>
                                     </div>
-    
+                                    
                                     <!-- Modal para agregar reservas -->
                                     <div class="modal fade" id="ModalAgregar{{ $cancha->ID_Cancha }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ $cancha->ID_Cancha }}" aria-hidden="true">
                                         <div class="modal-dialog modal-lg">
@@ -85,78 +145,128 @@
                                                                 <span class="visually-hidden">Next</span>
                                                             </button>
                                                         </div>
-                                                        <form action="{{ route('getHorariosOcupados') }}" method="POST">
-                                                            @csrf
-                                                            <!-- Campo para la fecha -->
-                                                            <label for="fechaReserva" class="mr-2 ms-5">Seleccionar Fecha:</label>
-                                                            <div class="form-group d-flex justify-content-center">
-                                                                <input type="date" id="fechaReserva" name="fechaReserva" class="form-control w-50" required>
-                                                                <input type="hidden" name="id" value="{{ $cancha->ID_Cancha }}">
+                                                        <div class="container mt-4">
+                                                            <div class="row">
+                                                                @if (session('fecha_reserva'))
+                                                                    <div class="col-md-6">
+                                                                @else
+                                                                    <div class="col-md-12">
+                                                                @endif
+                                                                    <div class="card">
+                                                                        <div class="card-header bg-primary text-white">Consulta de horarios</div>
+                                                                        <div class="card-body">
+                                                                            <form action="{{ route('getHorariosOcupados') }}" method="POST">
+                                                                                @csrf
+                                                                                <!-- Campo para la fecha -->
+                                                                                <label for="fechaReserva" class="mr-2 ms-5">Seleccionar Fecha:</label>
+                                                                                <div class="form-group d-flex justify-content-center">
+                                                                                    
+                                                                                    <input type="date" id="fechaReserva" name="fechaReserva" class="form-control w-50" value="{{ session('fecha_reserva') }}" required>
+                                                                                    <input type="hidden" name="id" value="{{ $cancha->ID_Cancha }}">
+                                                                                    <input type="hidden" name="idLocal" value="{{ $cancha->ID_Local }}">
+                                                                                </div>
+                                                                                <button type="submit" class="btn btn-primary">Consultar Horarios</button>
+                                                                            </form>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                @if (session('fecha_reserva'))
+                                                                    <div class="col-md-6">
+                                                                        <div class="card">
+                                                                            <div class="card-header bg-primary text-white">Horarios disponibles</div>
+                                                                            <div class="card-body">
+                                                                                
+                                                                                    <form action="{{ route('reservas-temporales.store') }}" method="POST" id="formReserva">
+                                                                                        @csrf
+                                                                                        <div class="mt-4">
+                                                                                            <h6 class="text-center">Seleccionar Horarios</h6>
+                                                                                            
+                                                                                            <!-- Contenedor de los inputs de hora de inicio y fin -->
+                                                                                            <div class="form-row d-flex justify-content-center mt-2">
+                                                                                                <!-- Hora de inicio -->
+                                                                                                <div class="form-group col-md-5">
+                                                                                                    <label for="horaInicio" class="mr-2">Hora de Inicio:</label>
+                                                                                                    <select id="horaInicio" name="hora_inicio" class="form-control" required>
+                                                                                                        <option value="">Seleccione hora de inicio</option>
+                                                                                                        @php
+                                                                                                            $horasInicio = substr($cancha->Hora_Apertura, 0, 2); // Hora de inicio en formato 24h (por ejemplo, 8 AM)
+                                                                                                            $horasFin = substr($cancha->Hora_Cierre, 0, 2);  // Hora de fin en formato 24h (por ejemplo, 8 PM)
+                                                                                                            $intervalo = 30; // Intervalo en minutos
+                                                                                                            $horarios = [];
+
+                                                                                                            // Generar horarios en intervalos de 30 minutos
+                                                                                                            for ($hora = $horasInicio; $hora < $horasFin; $hora++) {
+                                                                                                                $horarios[] = sprintf("%02d:00", $hora);
+                                                                                                                $horarios[] = sprintf("%02d:30", $hora);
+                                                                                                            }
+                                                                                                        @endphp
+
+                                                                                                        @foreach ($horarios as $horario)
+                                                                                                            @php
+                                                                                                                // Verifica si el horario está reservado para la cancha actual y dentro del intervalo de una reserva existente
+                                                                                                                $esReservado = isset($horariosReservados) && collect($horariosReservados)->contains(function($reservado) use ($horario, $cancha) {
+                                                                                                                    $horaInicio = \Carbon\Carbon::parse($reservado->Hora_Inicio);
+                                                                                                                    $horaFin = \Carbon\Carbon::parse($reservado->Hora_Fin);
+                                                                                                                    $horaActual = \Carbon\Carbon::parse($horario);
+
+                                                                                                                    return $reservado->ID_Cancha === $cancha->ID_Cancha && 
+                                                                                                                        $horaActual->between($horaInicio, $horaFin);
+                                                                                                                });
+                                                                                                            @endphp
+
+                                                                                                            @if (!$esReservado)
+                                                                                                                <option value="{{ $horario }}">{{ $horario }}</option>
+                                                                                                            @endif
+                                                                                                        @endforeach
+                                                                                                    </select>
+                                                                                                </div>
+
+                                                                                                <!-- Hora de fin -->
+                                                                                                <div class="form-group col-md-5">
+                                                                                                    <label for="horaFin" class="mr-2">Hora de Fin:</label>
+                                                                                                    <select id="horaFin" name="hora_fin" class="form-control" required>
+                                                                                                        <option value="">Seleccione hora de fin</option>
+                                                                                                        <!-- Imprimir todas las horas, como en el combobox de inicio -->
+                                                                                                        @foreach ($horarios as $horario)
+                                                                                                            @php
+                                                                                                                // Verifica si el horario está reservado para la cancha actual y dentro del intervalo de una reserva existente
+                                                                                                                $esReservado = isset($horariosReservados) && collect($horariosReservados)->contains(function($reservado) use ($horario, $cancha) {
+                                                                                                                    $horaInicio = \Carbon\Carbon::parse($reservado->Hora_Inicio);
+                                                                                                                    $horaFin = \Carbon\Carbon::parse($reservado->Hora_Fin);
+                                                                                                                    $horaActual = \Carbon\Carbon::parse($horario);
+
+                                                                                                                    return $reservado->ID_Cancha === $cancha->ID_Cancha && 
+                                                                                                                        $horaActual->between($horaInicio, $horaFin);
+                                                                                                                });
+                                                                                                            @endphp
+
+                                                                                                            @if (!$esReservado)
+                                                                                                                <option value="{{ $horario }}">{{ $horario }}</option>
+                                                                                                            @endif
+                                                                                                        @endforeach
+                                                                                                    </select>
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <!-- Campos ocultos para la reserva -->
+                                                                                            <input type="hidden" name="cancha_id" value="{{ $cancha->ID_Cancha }}">
+                                                                                            <input type="hidden" name="fecha" value="{{ session('fecha_reserva') }}">
+                                                                                            <input type="hidden" name="precio" value="{{ $cancha->precio }}">
+                                                                                            <input type="hidden" name="idUsuario" value="{{ auth()->user()->id }}">
+                                                                                            <input type="hidden" name="idLocal" value="{{ $cancha->ID_Local }}">
+                                                                                            <button type="submit" class="btn btn-primary mt-3">Reservar</button>
+                                                                                        </div>
+                                                                                    </form>
+                                                                                
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                @endif
                                                             </div>
-                                                            <button type="submit" class="btn btn-primary">Consultar Horarios</button>
-                                                        </form>
-                                                        <form>                    
-                                                            <div class="mt-4">
-                                                                <h6 class="text-center">Horarios Disponibles</h6>
-                                                                <table class="table table-striped text-center mt-2" id="tablaHorarios">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>Hora Inicio</th>
-                                                                            <th>Hora Fin</th>
-                                                                            <th>Reservar</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        @php
-                                                                            $horasInicio = 8; // Hora de inicio en formato 24h (8 AM)
-                                                                            $horasFin = 20; // Hora de fin en formato 24h (8 PM)
-                                                                            $intervalo = 30; // Intervalo en minutos
-                                                                            $horarios = [];
-                                                                
-                                                                            // Generar horarios en intervalos de 30 minutos
-                                                                            for ($hora = $horasInicio; $hora < $horasFin; $hora++) {
-                                                                                $horaInicio = sprintf("%02d:00", $hora);
-                                                                                $horaFin = sprintf("%02d:30", $hora);
-                                                                                $horarios[] = ['inicio' => $horaInicio, 'fin' => $horaFin];
-                                                                
-                                                                                $horaInicio = sprintf("%02d:30", $hora);
-                                                                                $horaFin = sprintf("%02d:00", $hora + 1);
-                                                                                $horarios[] = ['inicio' => $horaInicio, 'fin' => $horaFin];
-                                                                            }
-                                                                        @endphp
-                                                                
-                                                                        @foreach ($horarios as $horario)
-                                                                            @php
-                                                                                // Verifica si el horario está reservado para la cancha actual
-                                                                                $esReservado = isset($horariosReservados) && collect($horariosReservados)->contains(function($reservado) use ($horario, $cancha) {
-                                                                                    return $reservado->ID_Cancha === $cancha->ID_Cancha && 
-                                                                                        \Carbon\Carbon::parse($reservado->Hora_Inicio)->format('H:i') === \Carbon\Carbon::parse($horario['inicio'])->format('H:i') &&
-                                                                                        \Carbon\Carbon::parse($reservado->Hora_Fin)->format('H:i') === \Carbon\Carbon::parse($horario['fin'])->format('H:i');
-                                                                                });
-                                                                            @endphp
-                                                                            <tr>
-                                                                                <td>{{ $horario['inicio'] }}</td>
-                                                                                <td>{{ $horario['fin'] }}</td>
-                                                                                <td>
-                                                                                    <button type="button" class="btn btn-primary" {{ $esReservado ? 'disabled' : '' }}>
-                                                                                        Reservar
-                                                                                    </button>
-                                                                                </td>
-                                                                            </tr>
-                                                                        @endforeach
-                                                                    </tbody>
-                                                                </table>                                                                
-                                                            </div>
-                                                        </form>                                       
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <div>
+                                                        </div>
                                                         
+                                                                               
                                                     </div>
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                                    <button type="button" id="add-reserva" class="btn btn-primary">Agregar Reserva</button>
-                                                    <button type="submit" id="saveReservas-" class="btn btn-success">Guardar</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -171,7 +281,14 @@
         </main>
     </div>
     <script>
+        document.getElementById('formReservas').addEventListener('submit', function () {
+        // Esperar un momento para permitir el envío antes de recargar
+            setTimeout(function () {
+                location.reload(); // Refrescar la página actual
+            }, 500); // Medio segundo de espera (ajustable si es necesario)
+        });
         document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById('fechaReserva').min = new Date().toISOString().split("T")[0];
             @if(session('modal_open'))
                 var idCancha = {{ session('id_cancha') }}; // Obtener el ID de la cancha de la sesión
                 var modal = new bootstrap.Modal(document.getElementById('ModalAgregar' + idCancha), {
@@ -185,6 +302,24 @@
                     session()->forget('id_cancha');
                 @endphp
             @endif
+        });
+        
+    </script>
+    <script>
+        // Función para validar que la hora de fin no sea menor que la hora de inicio
+        document.getElementById('horaInicio').addEventListener('change', function() {
+            var horaInicio = this.value;
+            var horaFinSelect = document.getElementById('horaFin');
+            
+            // Filtrar las opciones del combo de hora de fin para que no puedan ser menores que la hora de inicio
+            for (var option of horaFinSelect.options) {
+                var horaFin = option.value;
+                if (horaFin <= horaInicio) {
+                    option.disabled = true;  // Deshabilitar opción si la hora de fin es menor o igual a la hora de inicio
+                } else {
+                    option.disabled = false; // Habilitar opción si la hora de fin es mayor a la hora de inicio
+                }
+            }
         });
     </script>
     

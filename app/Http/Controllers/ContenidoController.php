@@ -13,7 +13,7 @@ class ContenidoController extends Controller
     
         // 1. Consulta para obtener toda la información del local
         $locales = DB::select("SELECT L.ID_Local, L.nombre, L.direccion, L.latitud, L.longitud, 
-                   U.telefono, CONCAT(U.nombre, ' ', U.primerApellido, ' ', U.segundoApellido) AS nombreCompleto
+                   U.telefono, CONCAT(U.nombre, ' ', U.primerApellido, ' ', U.segundoApellido) AS nombreCompleto,L.Hora_Apertura,L.Hora_Cierre
                                 FROM locales L
                                 INNER JOIN users U ON L.ID_Local = U.local
                                 WHERE L.estado = 1 AND L.ID_Local = ?
@@ -78,11 +78,13 @@ class ContenidoController extends Controller
             $latitud = $request->latitud ?: $localActual->latitud;
             $longitud = $request->longitud ?: $localActual->longitud;
     
-            $sql = DB::update("UPDATE locales SET nombre=?, direccion=?, latitud=?, longitud=?, fechaModificacion=CURRENT_TIMESTAMP, idUsuario=$idUsuario WHERE ID_Local=?", [
+            $sql = DB::update("UPDATE locales SET nombre=?, direccion=?, latitud=?, longitud=?, Hora_Apertura=?, Hora_Cierre=?, fechaModificacion=CURRENT_TIMESTAMP, idUsuario=$idUsuario WHERE ID_Local=?", [
                 strtoupper($request->nombre),
                 strtoupper($request->direccion),
                 $latitud,
                 $longitud,
+                $request->horaApertura,
+                $request->horaCierre,
                 $request->id
             ]);
     

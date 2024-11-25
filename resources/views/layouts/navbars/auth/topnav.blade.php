@@ -8,6 +8,7 @@
                 <li class="breadcrumb-item text-sm"><a class="opacity-5 text-white" href="javascript:;">Pagina</a></li>
                 <li class="breadcrumb-item text-sm text-white active" aria-current="page">{{ $title }}</li>
             </ol>
+            
             <h6 class="font-weight-bolder text-white mb-0">{{ $title }}</h6>
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
@@ -18,6 +19,7 @@
                 </div> --}}
             </div>
             <ul class="navbar-nav justify-content-end">
+                
                 <li class="nav-item d-flex align-items-center">
                     <form role="form" method="post" action="{{ route('logout') }}" id="logout-form">
                         @csrf
@@ -38,7 +40,7 @@
                         </div>
                     </a>
                 </li>
-
+                
                 {{-- <li class="nav-item dropdown pe-2 d-flex align-items-center">
                     <a href="javascript:;" class="nav-link text-white p-0" id="dropdownMenuButton"
                         data-bs-toggle="dropdown" aria-expanded="false">
